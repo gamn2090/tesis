@@ -1,0 +1,9 @@
+<?php
+session_start();
+      $usuario=$_SESSION['usuario'];
+      $nivel=$_SESSION['nivel'];  
+      $bandera=$_SESSION['bandera'];  
+include('../config.php');
+include('../procesos/funciones.php');
+visualizar_historico($nivel,$conn);
+?>
