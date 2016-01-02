@@ -2,7 +2,7 @@
 	include ("../procesos/funciones.php");
 	include ("../config.php");
 
-											
+					$exp=$_POST['exp'];
 					$cedula=$_POST['cedula'];					
 					$razon=$_POST['razon'];					
 					$promedio=$_POST['promedio'];					
@@ -20,13 +20,13 @@
 				
 				if($decision=="Indefinida")
 				{
-				$mensaje=ingresar_historico($cedula,$fecha_solicitud,$razon,$promedio,$solicitudes,$solicitud_actual,$aval,$fecha,$medidas,$decision2,$observaciones,$acuerdo,$conn);
+				$mensaje1=ingresar_historico($exp,$cedula,$fecha_solicitud,$razon,$promedio,$solicitudes,$solicitud_actual,$aval,$fecha,$medidas,$decision2,$observaciones,$acuerdo,$conn);
 				}
 				else
 				{					
-					$mensaje=ingresar_historico($cedula,$fecha_solicitud,$razon,$promedio,$solicitudes,$solicitud_actual,$aval,$fecha,$medidas,$decision,$observaciones,$acuerdo,$conn);
+					$mensaje1=ingresar_historico($exp,$cedula,$fecha_solicitud,$razon,$promedio,$solicitudes,$solicitud_actual,$aval,$fecha,$medidas,$decision,$observaciones,$acuerdo,$conn);
 				}
-				
+				$mensaje=$exp;
 				header("location: resultado.php?mensaje=$mensaje");
 				
 				

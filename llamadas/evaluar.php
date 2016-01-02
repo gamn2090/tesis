@@ -61,9 +61,9 @@ session_start();
 <?php
 		$cedula=$_GET['id'];		
 		$cedula=base64_decode($cedula);	
-		$numero_soli=$_GET['numero'];
-		$numero_soli=base64_decode($numero_soli);
-    cargar_datos_estudiante($numero_soli,$cedula,$nivel,$conn2,$conn);
+		$numero_sol=$_GET['numero'];
+		$numero_sol=base64_decode($numero_sol);
+    cargar_datos_estudiante($numero_sol,$cedula,$nivel,$conn2,$conn);
 
 ?>
 		</div>

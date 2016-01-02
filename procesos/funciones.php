@@ -227,11 +227,46 @@ function cargar_datos_coord($usuario,$conn)
 					FUNCION PARA MOSTRAR LOS PROCESOS EN TABLAS
 ============================================================================================================================*/
 
-function mostrar_proceso($proceso,$conn,$nivel,$conn2)
+function mostrar_proceso_sec($proceso,$conn,$conn2)
 {   if($proceso=="Retiro" || $proceso=="Reingreso")
+	{		
+			$query="SELECT * FROM solicitudes WHERE (proceso LIKE '%$proceso%' AND exp LIKE '-1')";
+			$result=$conn->Execute($query);			
+			if($result==false)
+			{
+				echo "error al recuperar: ".$conn->ErrorMsg()."<br>" ;
+			}
+			else
+			{		
+
+				while(!$result->EOF) 
+				{	
+					for ($i=0, $max=$result->FieldCount(); $i<$max; $i++)
+					{							
+						$cedula=$result->fields[0];
+						$numero_sol=$result->fields[1];
+						$razon=$result->fields[2];	
+						$link="<a href=\"llamadas/evaluar.php?id=".$cedula."&numero=".$numero_sol."\" target='_blank'>Evaluar</a>";						
+						$result->MoveNext();											
+						break;												
+					}
+					$data[$j]=array("cedula"=>$cedula,
+									"numero"=> $numero_sol,
+									"razon"=> $razon,
+									"link"=>$link);
+					$j++;
+					
+				} 
+				//header('Content-type: application/json');
+				return json_encode($data);
+
+			}
+
+	}
+	else
 	{
-			$query="SELECT * FROM solicitudes WHERE (proceso LIKE '%$proceso%')";	
-			$result=$conn->Execute($query);
+			$query2="SELECT * FROM solicitud_cde";	
+			$result=$conn->Execute($query2);
 			if($result==false)
 			{
 				echo "error al recuperar: ".$conn->ErrorMsg()."<br>" ;
@@ -240,12 +275,14 @@ function mostrar_proceso($proceso,$conn,$nivel,$conn2)
 			{	
 			 
 				?>
-					<table class="bordered" border="0" cellspacing=25 cellpadding=2 style="font-size: 10pt">
+					<table border="0" class="bordered" cellspacing=25 cellpadding=2 style="font-size: 10pt">
 					<tr>
 					<td><font face="verdana"><b>Cedula</b></font></td>
-					<td><font face="verdana"><b>Solicitud</b></font></td>
-					<td><font face="verdana"><b>Razon</b></font></td>			
-					<td><font face="verdana"><b>      </b></font></td>	
+                    <td><font face="verdana"><b>Solicitud</b></font></td>
+                    <td><font face="verdana"><b>Razon</b></font></td>		
+					<td><font face="verdana"><b>Carrera Actual</b></font></td>	
+                    <td><font face="verdana"><b>Carrera Siguiente</b></font></td>
+                    <td><font face="verdana"><b>                 </b></font></td>
 					</tr>
 					<?php
 					
@@ -257,36 +294,57 @@ function mostrar_proceso($proceso,$conn,$nivel,$conn2)
 							
 							$numero_sol=$result->fields[1];
 							$cedula=$result->fields[0];
-							$razon=$result->fields[2];
-							$exp=$result->fields[5];	
+							$razon=$result->fields[2];	
+							$carrera_actual=$result->fields[3];
+							$carrera_siguiente=$result->fields[4];
 							$cedula2=base64_encode ($cedula);
-							$numero_sol2=base64_encode ($numero_sol);	
-							
-							if($nivel==sha1(md5("OverNineThousand")))
+							$numero_sol2=base64_encode ($numero_sol);
+							//$carrera_actual=base64_encode ($carrera_actual);
+							//$carrera_siguiente=base64_encode ($carrera_siguiente);	
+						$query3="SELECT * FROM esp WHERE codigo LIKE '%$carrera_actual%'";
+						$result=$conn2->Execute($query3);
+						if($result==false)
+						{
+							echo "error al recuperar: ".$conn2->ErrorMsg()."<br>" ;
+						}
+						else
+						{	
+							while(!$result->EOF) 
 							{			
-								if($exp!="-1" && $exp!="0")
-								{														
-									echo "<tr><td width=\"200\"><font face=\"verdana\">" .$cedula  . "</font></td>";					
-									echo "<td width=\"200\"><font face=\"verdana\">" .$numero_sol. "</font></td>";
-									echo "<td width=\"200\"><font face=\"verdana\">" .$razon . "</font></td>";								
-									echo "<td width=\"200\"><font face=\"verdana\"><a href=\"evaluar.php?id=".$cedula2."&numero=".$numero_sol2."\" target='_blank'>Evaluar</a></p>"; "</font></td></tr>";							  
-								}
-								$result->MoveNext();											
-								break;
-							}
-							else
-							{	
-								if($exp=="-1")
+								for ($i=0, $max=$result->FieldCount(); $i<$max; $i++)
 								{	
-									echo "<tr><td width=\"200\"><font face=\"verdana\">" .$cedula  . "</font></td>";					
-									echo "<td width=\"200\"><font face=\"verdana\">" .$numero_sol. "</font></td>";
-									echo "<td width=\"200\"><font face=\"verdana\">" .$razon . "</font></td>";
-									echo "<td width=\"200\"><font face=\"verdana\"><a href=\"evaluar.php?id=".$cedula2."&numero=".$numero_sol2."\" target='_blank'>Evaluar</a></p>"; "</font></td></tr>";							  
-															
+									$carrera_actual=$result->fields[1];
 								}
-								$result->MoveNext();											
 								break;
 							}
+						}	
+						$query4="SELECT * FROM esp WHERE codigo LIKE '%$carrera_siguiente%'";
+						$result=$conn2->Execute($query4);
+						if($result==false)
+						{
+							echo "error al recuperar: ".$conn2->ErrorMsg()."<br>" ;
+						}
+						else
+						{	
+							while(!$result->EOF) 
+							{			
+								for ($i=0, $max=$result->FieldCount(); $i<$max; $i++)
+								{	
+									$carrera_siguiente=$result->fields[1];
+								}
+								break;
+							}
+						}						
+														
+								echo "<tr><td width=\"200\"><font face=\"verdana\">" .$cedula  . "</font></td>";					
+								echo "<td width=\"200\"><font face=\"verdana\">" .$razon . "</font></td>";
+								echo "<td width=\"200\"><font face=\"verdana\">" .$numero_sol. "</font></td>";
+								echo "<td width=\"200\"><font face=\"verdana\">" .$carrera_actual . "</font></td>";
+								echo "<td width=\"200\"><font face=\"verdana\">" .$carrera_siguiente . "</font></td>";
+
+								$result->MoveNext();											
+								break;					
+							
 							
 					}
 				}
@@ -294,6 +352,98 @@ function mostrar_proceso($proceso,$conn,$nivel,$conn2)
 				?>
 				</table>
 				<?php
+			}
+	}
+	$conn->Close();
+	$conn2->Close();
+}
+
+function mostrar_proceso_coord($proceso,$conn,$conn2,$offset)
+{   if($proceso=="Retiro" || $proceso=="Reingreso")
+	{		
+			$limit=3;
+			$query2="SELECT * FROM solicitudes WHERE (proceso LIKE '%$proceso%' AND exp NOT LIKE '-1') ORDER BY fecha_solicitud";
+			$result2=$conn->Execute($query2);
+			$query="SELECT * FROM solicitudes WHERE (proceso LIKE '%$proceso%' AND exp NOT LIKE '-1') ORDER BY fecha_solicitud LIMIT $limit OFFSET $offset";	
+			$result=$conn->Execute($query);	
+			if($result==false)
+			{
+				echo "error al recuperar: ".$conn->ErrorMsg()."<br>" ;
+			}
+			else
+			{		
+			 	
+			 	$total=$result2->RowCount();				
+		 		$pages=$total/$limit;
+		 		$pages= ceil($pages);
+
+		 		$page = min($pages, filter_input(INPUT_GET, 'page', FILTER_VALIDATE_INT, array(
+		        'options' => array(
+		            'default'   => 1,
+		            'min_range' => 1,
+		        ),
+		    	)));
+
+		    	//$offset = ($page - 1)  * $limit;
+		    	$start = $offset+1;
+    			$end = min(($offset + $limit), $total);
+
+    			
+				
+				/*$stmt = $conn->prepare("SELECT * FROM solicitudes WHERE (proceso LIKE '%$proceso%') ORDER BY fecha_solicitud LIMIT :limit OFFSET :offset");
+
+				// Bind the query params
+			    $stmt->bindParam(':limit', $limit, PDO::PARAM_INT);
+			    $stmt->bindParam(':offset', $offset, PDO::PARAM_INT);
+			   // $stmt->execute();*/
+
+				?>
+					<table class="bordered" border="0" cellspacing=25 cellpadding=2 style="font-size: 10pt">
+					<tr>
+					<td><font face="verdana"><b>Cedula</b></font></td>
+					<td><font face="verdana"><b>Solicitud</b></font></td>
+					<td><font face="verdana"><b>Razon</b></font></td>			
+					<td><font face="verdana"><b>      </b></font></td>	
+					</tr>
+					<?php
+
+				
+
+				while(!$result->EOF) 
+				{	
+					for ($i=0, $max=$result->FieldCount(); $i<$max; $i++)
+					{
+							
+							$numero_sol=$result->fields[1];
+							$cedula=$result->fields[0];
+							$razon=$result->fields[2];
+							$exp=$result->fields[5];	
+							$cedula2=base64_encode ($cedula);
+							$numero_sol2=base64_encode ($numero_sol);	
+							
+																				
+									echo "<tr><td width=\"200\"><font face=\"verdana\">" .$cedula  . "</font></td>";					
+									echo "<td width=\"200\"><font face=\"verdana\">" .$numero_sol. "</font></td>";
+									echo "<td width=\"200\"><font face=\"verdana\">" .$razon . "</font></td>";								
+									echo "<td width=\"200\"><font face=\"verdana\"><a href=\"evaluar.php?id=".$cedula2."&numero=".$numero_sol2."\" target='_blank'>Evaluar</a></p>"; "</font></td></tr>";							  
+								
+								$result->MoveNext();											
+								break;							
+							
+					}
+				}
+			  
+				?>
+				</table>
+				<?php
+				// The "back" link
+			   $prevlink = ($page > 1) ? '<a data-url="../llamadas/retiros.php?page=1" id="linkf" title="First page">&laquo;</a> <a data-url="../llamadas/retiros.php?page=' . ($page - 1) . '" id="link_'.($page-1).'" title="Previous page">&lsaquo;</a>' : '<span class="disabled">&laquo;</span> <span class="disabled">&lsaquo;</span>';
+
+			    // The "forward" link
+			    $nextlink = ($page < $pages) ? '<a data-url="../llamadas/retiros.php?page=' . ($page + 1) . '" id="link_'.($page+1).'" title="Next page">&rsaquo;</a> <a data-url="../llamadas/retiros.php?page=' . $pages . '" id="linkl" title="Last page">&raquo;</a>' : '<span class="disabled">&rsaquo;</span> <span class="disabled">&raquo;</span>';
+
+			    // Display the paging information
+			    echo '<div id="paging"><p>', $prevlink, ' Page ', $page, ' of ', $pages, ' pages, displaying ', $start, '-', $end, ' of ', $total, ' results ', $nextlink, '  </p></div>';
 			}	
 	}
 	else
@@ -368,8 +518,7 @@ function mostrar_proceso($proceso,$conn,$nivel,$conn2)
 								break;
 							}
 						}						
-							if($nivel==sha1(md5("OverNineThousand")))
-							{																
+																							
 								echo "<tr><td width=\"200\"><font face=\"verdana\">" .$cedula  . "</font></td>";					
 								echo "<td width=\"200\"><font face=\"verdana\">" .$numero_sol. "</font></td>";
 								echo "<td width=\"200\"><font face=\"verdana\">" .$razon. "</font></td>";
@@ -377,19 +526,7 @@ function mostrar_proceso($proceso,$conn,$nivel,$conn2)
 								echo "<td width=\"200\"><font face=\"verdana\">" .$carrera_siguiente . "</font></td>";
 								echo "<td width=\"200\"><font face=\"verdana\"><a href=\"evaluar.php?id=".$cedula2."&numero=".$numero_sol2."\" target='_blank'>Evaluar</a></p>"; "</font></td></tr>";							  
 								$result->MoveNext();											
-								break;
-							}
-							else
-							{	
-								echo "<tr><td width=\"200\"><font face=\"verdana\">" .$cedula  . "</font></td>";					
-								echo "<td width=\"200\"><font face=\"verdana\">" .$razon . "</font></td>";
-								echo "<td width=\"200\"><font face=\"verdana\">" .$numero_sol. "</font></td>";
-								echo "<td width=\"200\"><font face=\"verdana\">" .$carrera_actual . "</font></td>";
-								echo "<td width=\"200\"><font face=\"verdana\">" .$carrera_siguiente . "</font></td>";
-
-								$result->MoveNext();											
-								break;					
-							}
+								break;							
 							
 					}
 				}
@@ -402,6 +539,7 @@ function mostrar_proceso($proceso,$conn,$nivel,$conn2)
 	$conn->Close();
 	$conn2->Close();
 }
+
 
 /*============================================================================================================================
 					FUNCION PARA EL CALCULO DE LOS PARAMETROS DE LOS TOMADORES DE DECISIONES
@@ -1294,7 +1432,26 @@ function DESICION($fecha,$cedula,$razon,$nombre,$apellido,$discapacidad,$promedi
 			}	
 		}
 	}
-	mostrar_decision($fecha_solicitud,$cedula,$pros_aca,$razon,$solicitud_actual,$decision,$solicitudes_anteriores,$medidas_resul,$tiempo_soli,$razon_aval,$conn,$conn2);
+
+	$query3="SELECT * FROM solicitudes WHERE (cedula LIKE '%$cedula%' AND fecha_solicitud = '%$fecha_solicitud%')";
+		$result=$conn->Execute($query3);
+		if($result==false)
+		{echo "error al recuperar: ".$conn->ErrorMsg()."<br>" ;
+			
+		}	
+		else
+		{
+			while(!$result->EOF) 
+			{
+				for ($i=0, $max=$result->FieldCount(); $i<$max; $i++)
+				{
+					$exp=$result->fields[5];
+				}
+				$result->MoveNext();
+			}
+		}
+
+	mostrar_decision($exp,$fecha_solicitud,$cedula,$pros_aca,$razon,$solicitud_actual,$decision,$solicitudes_anteriores,$medidas_resul,$tiempo_soli,$razon_aval,$conn,$conn2);
 	$conn->Close();
 	$conn2->Close();
 }
@@ -1302,7 +1459,7 @@ function DESICION($fecha,$cedula,$razon,$nombre,$apellido,$discapacidad,$promedi
 FUNCION PARA MOSTRAR LAS DECISIONES 	
 ======================================================================================================================*/
 
-function mostrar_decision($fecha_solicitud,$cedula,$pros_aca,$razon,$solicitud_actual,$decision,$solicitudes_anteriores,$medidas_resul,$tiempo_soli,$razon_aval,$conn,$conn2)
+function mostrar_decision($exp,$fecha_solicitud,$cedula,$pros_aca,$razon,$solicitud_actual,$decision,$solicitudes_anteriores,$medidas_resul,$tiempo_soli,$razon_aval,$conn,$conn2)
 {
 	$query2="SELECT * FROM estudiante WHERE ced LIKE '%$cedula%'";
 	$result=$conn2->Execute($query2);
@@ -1327,6 +1484,7 @@ function mostrar_decision($fecha_solicitud,$cedula,$pros_aca,$razon,$solicitud_a
 	<form class="col s12" id="decision" action="ingresar.php" method="POST">
            	        <input type="hidden" id="fecha_solicitud" name="fecha_solicitud" value="<?php echo $fecha_solicitud; ?>">
         			<input type="hidden" id="nombre" name="nombre"  value="<?php echo $nombre; ?>">
+					<input type="hidden" id="exp" name="exp"  value="<?php echo $exp; ?>">
 			        <input type="hidden" id="cedula" name="cedula"  value="<?php echo $cedula; ?>">
 			        <input type="hidden" id="solicitud" name="solicitud" value="<?php echo $solicitud_actual ?>">
 			        <input type="hidden" id="razon" name="razon" value="<?php echo $razon ?>">
@@ -1706,7 +1864,7 @@ function actualizar_puntaje($proceso,$razon,$puntaje,$fecha,$conn)
  FUNCION PARA INGRESAR EN LA BASE DE DATOS HISTORICA  	
  ======================================================================================================================*/
 
-function ingresar_historico($cedula,$fecha_solicitud,$razon,$promedio,$solicitudes,$solicitud_actual,$aval,$fecha,$medidas,$decision,$observaciones,$acuerdo,$conn)
+function ingresar_historico($exp,$cedula,$fecha_solicitud,$razon,$promedio,$solicitudes,$solicitud_actual,$aval,$fecha,$medidas,$decision,$observaciones,$acuerdo,$conn)
 {
 	if($acuerdo=='No')
 	{
@@ -1719,7 +1877,7 @@ function ingresar_historico($cedula,$fecha_solicitud,$razon,$promedio,$solicitud
 			$decision="Aprobado";
 		}
 	}		
-	$query= "INSERT INTO decisiones (cedula, fecha_solicitud, razon, promedio, solicitudes, solicitud_actual, aval, medidas, tiempo_sol, decision, observaciones, acuerdo) VALUES ('$cedula', '$fecha_solicitud', '$razon', '$promedio', '$solicitudes', '$solicitud_actual', '$aval', '$medidas', '$fecha', '$decision', '$observaciones', '$acuerdo')"; 
+	$query= "INSERT INTO decisiones (cedula, fecha_solicitud, razon, promedio, solicitudes, solicitud_actual, aval, medidas, tiempo_sol, decision, observaciones, acuerdo, exp) VALUES ('$cedula', '$fecha_solicitud', '$razon', '$promedio', '$solicitudes', '$solicitud_actual', '$aval', '$medidas', '$fecha', '$decision', '$observaciones', '$acuerdo', '$exp')"; 
 	if($conn->Execute($query)==false)
 	{
 		//$bandera=1;

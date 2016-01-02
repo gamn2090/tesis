@@ -72,7 +72,7 @@ session_start();
 					else
 					{			
 						if(isset($_POST['Nombre']))
-						{
+						{ 
 							$nombre=$_POST['Nombre'];
 							$apellido=$_POST['Apellido'];
 							$cedula=$_POST['cedula'];

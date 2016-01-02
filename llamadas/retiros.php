@@ -4,8 +4,61 @@ include('../procesos/funciones.php');
 $proceso="Retiro";
 session_start();
 $nivel=$_SESSION['nivel'];
-mostrar_proceso($proceso,$conn,$nivel,$conn2);
+$bandera=$_SESSION['bandera'];  
+/*if($nivel==$bandera)
+	{
+		mostrar_proceso_coord($proceso,$conn,$conn2);
+	}
+	else
+	{
+		mostrar_proceso_sec($proceso,$conn,$conn2);
+	}*/
 ?>
+	<!DOCTYPE html>
+<html>
+<head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8">
+  	
+    <link rel="stylesheet" type="text/css" href="../css/jquery.dataTables.css">
+    <link rel="stylesheet" type="text/css" href="../css/dataTables.editor.css">
+    <script src="https://code.jquery.com/jquery-2.1.4.min.js"></script>
+  	<script src="../js/init.js"></script>
+  	<script src="../js/materialize.js"></script>
+    <script type="text/javascript" language="javascript" src="../js/jquery.dataTables.js"></script>
+    <script type="text/javascript" language="javascript" src="../js/dataTables.tableTools.js"></script>
+    <script type="text/javascript" language="javascript" src="../js/dataTables.editor.js"></script>
+
+</head>
+<body>
+
+    <table id="mytable" class="display" style="text-align:center" cellspacing="0" width="100%">
+        <thead>
+            <tr>
+                <th>cedula</th>
+                <th>numero</th>
+                <th>razon</th>  
+                <th>accion</th>               
+            </tr>
+        </thead>
+ 
+        <tfoot>
+            <tr>
+                <th>cedula</th>
+                <th>numero</th>
+                <th>razon</th>  
+                 <th>accion</th>               
+            </tr>
+        </tfoot>
+    </table>
+
+
+
+
+</body>
+</html>
+
+
+
 
 	
 					

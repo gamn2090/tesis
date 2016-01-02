@@ -6,8 +6,9 @@ $(document).ready(function(){
   $(".button-collapse").sideNav();
   $('select').material_select();
   carga("historico.php");
-  carga2("crear_cuenta.php");				
+  carga2("crear_cuenta.php");	
 
+			
 //--------------------------Procesos---------------------------------------------------------				
 				
 				$("#historico").on('click', function() {
@@ -21,8 +22,22 @@ $(document).ready(function(){
 					var url = $(this).attr('data-url');
 					carga(url);
 					$("#imagen").attr("src","../img/retiro.jpg");
-					$('#nombre').html('RETIROS ACADÉMICOS');
+					$('#nombre').html('RETIROS ACADÉMICOS');					
 				})
+
+				var datatable = $('#mytable').DataTable({
+				       ajax: "../prueba.php",
+				       "sAjaxDataProp": "",
+						"bProcessing": true, 
+				         columns: 
+				         [
+				            {data:"cedula"},
+				            {data:"numero"},
+				            {data:"razon"},
+				            {data:"link"}			            
+      					  ]    
+      					     
+				    });		  
 
 				$("#reingresos").on('click', function() {
 					var url = $(this).attr('data-url');
@@ -34,9 +49,11 @@ $(document).ready(function(){
 				$("#CDE").on('click', function() {
 					var url = $(this).attr('data-url');					
 					carga(url);
+					console.log(url);
 					$("#imagen").attr("src","../img/cambio_especialidad.jpg");
 					$('#nombre').html('CAMBIO DE ESPECIALIDAD');
 				})
+				
 
 //-------------------------Mantenimiento---------------------------------------------------			
 
@@ -75,10 +92,17 @@ $(document).ready(function(){
 					$("#imagen2").attr("src","../img/Udo.jpg");
 					$('#nombre2').html('CAMBIAR VALORES DE DECISIONES DE REINGRESOS');
 				})	
-});function carga(pagina,img){				
-				$("#principal").load(pagina);			
+
+				
+
+			function carga(pagina,img){				
+				$("#principal").load(pagina);	
 			};
 
-function carga2(pagina,img){				
-				$("#principal2").load(pagina);			
+			function carga2(pagina,img){				
+				$("#principal2").load(pagina);
 			};
+				
+});
+		
+				

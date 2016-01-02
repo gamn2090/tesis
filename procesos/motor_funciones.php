@@ -1,5 +1,7 @@
 <?php 
-	
+	session_start();
+	$nivel=$_SESSION['nivel'];
+	$bandera=$_SESSION['bandera'];  
  	include('../config.php');
  	include('funciones.php');	
     if(isset($_POST['accion'])){ $accion=$_POST['accion']; 
@@ -56,10 +58,8 @@
  		break; 		
  		case 'Evaluar Bachiller': /*evaluar bachiller*/
  		 	mostrar($cedula,$nombre,$apellido,$email,$celular,$direccion,$promedio,$discapacidad,$nacionalidad,$solicitudes2,$proceso);
- 		break; 
-				
- 			
- 	}
- }//fin isset[$_post[accion]]
+ 		break;		 			
+			}
+	}//fin isset[$_post[accion]]
 
 ?>

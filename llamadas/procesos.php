@@ -5,6 +5,7 @@
       $bandera=$_SESSION['bandera'];  
   include ("../procesos/funciones.php");
   include ("../config.php");
+  
 if($usuario!= NULL)
 {
 ?>
@@ -18,12 +19,18 @@ if($usuario!= NULL)
   <title>Coordinación Académica</title>
 
   <!-- CSS  -->
+  <link rel="stylesheet" type="text/css" href="../css/jquery.dataTables.css">
+    <link rel="stylesheet" type="text/css" href="../css/dataTables.editor.css">
+    <script src="https://code.jquery.com/jquery-2.1.4.min.js"></script>
+    <script src="../js/init.js"></script>
+    <script type="text/javascript" language="javascript" src="../js/jquery.dataTables.js"></script>
+    <script type="text/javascript" language="javascript" src="../js/dataTables.tableTools.js"></script>
+    <script type="text/javascript" language="javascript" src="../js/dataTables.editor.js"></script>
   <link href="https://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet">
   <link href="../css/materialize.css" type="text/css" rel="stylesheet" media="screen,projection"/>
   <link href="../css/style.css" type="text/css" rel="stylesheet" media="screen,projection"/>
   <link rel="stylesheet" href="../css/main.css">
   <link rel="stylesheet" href="../css/font.css">
-  <script type="text/javascript" src="../jquery/probandini.js"></script>
 </head>
 <body>
   <nav class="white" role="navigation">
@@ -84,7 +91,10 @@ if($usuario!= NULL)
         </ul>        
       </div> 
       
-        <div id="principal" class="col s12">          
+        <div id="principal" class="col s12">    
+
+            
+
         </div>
     </div> 
     </div> 
@@ -153,9 +163,7 @@ if($usuario!= NULL)
 
 
   <!--  Scripts-->
-  <script src="https://code.jquery.com/jquery-2.1.4.min.js"></script>
   <script src="../js/materialize.js"></script>
-  <script src="../js/init.js"></script>
 
 
 
