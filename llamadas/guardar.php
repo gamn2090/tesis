@@ -85,10 +85,10 @@ session_start();
 							$aval=$_POST['aval'];
 							$cant_soli=$_POST['cant_soli'];
 							$fecha=$_POST['fecha'];	
-							$anio=$_POST['anio'];			
+							$anio=$_POST['anio'];		
+              $numero_soli=$_POST['numero_soli'];	
 						}
-						$periodo=tiempo_solicitud_retiro($anio,$fecha,$conn2);
-						$resultado=DESICION($fecha,$cedula,$razon,$nombre,$apellido,$discapacidad,$promedio,$solicitudes,$solicitud_actual,$aval,$cant_soli,$periodo,$conn,$conn2);
+						$resultado=validar_solicitud($numero_soli,$anio,$fecha,$cedula,$razon,$solicitud_actual,$aval,$conn,$conn2);
 						
 						}
 				}

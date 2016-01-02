@@ -257,26 +257,35 @@ function mostrar_proceso($proceso,$conn,$nivel,$conn2)
 							
 							$numero_sol=$result->fields[1];
 							$cedula=$result->fields[0];
-							$razon=$result->fields[2];	
+							$razon=$result->fields[2];
+							$exp=$result->fields[5];	
 							$cedula2=base64_encode ($cedula);
 							$numero_sol2=base64_encode ($numero_sol);	
 							
 							if($nivel==sha1(md5("OverNineThousand")))
-							{																
-								echo "<tr><td width=\"200\"><font face=\"verdana\">" .$cedula  . "</font></td>";					
-								echo "<td width=\"200\"><font face=\"verdana\">" .$numero_sol. "</font></td>";
-								echo "<td width=\"200\"><font face=\"verdana\">" .$razon . "</font></td>";								
-								echo "<td width=\"200\"><font face=\"verdana\"><a href=\"evaluar.php?id=".$cedula2."&numero=".$numero_sol2."\" target='_blank'>Evaluar</a></p>"; "</font></td></tr>";							  
+							{			
+								if($exp!="-1" && $exp!="0")
+								{														
+									echo "<tr><td width=\"200\"><font face=\"verdana\">" .$cedula  . "</font></td>";					
+									echo "<td width=\"200\"><font face=\"verdana\">" .$numero_sol. "</font></td>";
+									echo "<td width=\"200\"><font face=\"verdana\">" .$razon . "</font></td>";								
+									echo "<td width=\"200\"><font face=\"verdana\"><a href=\"evaluar.php?id=".$cedula2."&numero=".$numero_sol2."\" target='_blank'>Evaluar</a></p>"; "</font></td></tr>";							  
+								}
 								$result->MoveNext();											
 								break;
 							}
 							else
 							{	
-								echo "<tr><td width=\"200\"><font face=\"verdana\">" .$cedula  . "</font></td>";					
-								echo "<td width=\"200\"><font face=\"verdana\">" .$numero_sol. "</font></td>";
-								echo "<td width=\"200\"><font face=\"verdana\">" .$razon . "</font></td>";	
+								if($exp=="-1")
+								{	
+									echo "<tr><td width=\"200\"><font face=\"verdana\">" .$cedula  . "</font></td>";					
+									echo "<td width=\"200\"><font face=\"verdana\">" .$numero_sol. "</font></td>";
+									echo "<td width=\"200\"><font face=\"verdana\">" .$razon . "</font></td>";
+									echo "<td width=\"200\"><font face=\"verdana\"><a href=\"evaluar.php?id=".$cedula2."&numero=".$numero_sol2."\" target='_blank'>Evaluar</a></p>"; "</font></td></tr>";							  
+															
+								}
 								$result->MoveNext();											
-								break;					
+								break;
 							}
 							
 					}
@@ -398,7 +407,7 @@ function mostrar_proceso($proceso,$conn,$nivel,$conn2)
 					FUNCION PARA EL CALCULO DE LOS PARAMETROS DE LOS TOMADORES DE DECISIONES
 ============================================================================================================================*/
 
-function cargar_datos_estudiante($numero_soli,$cedula,$conn2,$conn)
+function cargar_datos_estudiante($numero_soli,$cedula,$nivel,$conn2,$conn)
 {	
 	$query="SELECT * FROM solicitudes WHERE ((cedula LIKE '%$cedula%') AND (numero_soli = $numero_soli))";	
 	$result=$conn->Execute($query);
@@ -411,7 +420,15 @@ function cargar_datos_estudiante($numero_soli,$cedula,$conn2,$conn)
 		$proceso=$result->fields[3];
 		$fecha=$result->fields[4];
 		$razon=$result->fields[2];
+		$exp=$result->fields[5];
 	}
+
+	//SABER SI TIENE AVAL
+	if($exp!='-1' && $exp!="0")
+	{$aval="Si";}
+	else
+	{$aval="No";}
+
 	$solicitudes1=buscar_control_estudio($cedula,$conn2,$proceso);
 	$solicitudes2=buscar_historico($cedula,$conn,$proceso);
 	if(($solicitudes1=='no tiene') && ($solicitudes2=='no tiene'))
@@ -477,8 +494,15 @@ function cargar_datos_estudiante($numero_soli,$cedula,$conn2,$conn)
 		{
 			$cant_soli=$cant_soli1+$cant_soli2;	
 		}
-		
-		mostrar_datos_estudiante($cedula,$nombre,$apellido,$razon,$promedio,$discapacidad,$nacionalidad,$solicitudes,$proceso,$cant_soli,$fecha);
+		if($nivel==sha1(md5("OverNineThousand")))
+		{
+			mostrar_datos_estudiante_coord($aval,$cedula,$nombre,$apellido,$razon,$promedio,$discapacidad,$nacionalidad,$solicitudes,$proceso,$cant_soli,$fecha);
+
+		}
+		else
+		{
+			mostrar_datos_estudiante_sec($numero_soli,$cedula,$nombre,$apellido,$razon,$promedio,$discapacidad,$nacionalidad,$solicitudes,$proceso,$cant_soli,$fecha);
+		}
 	}
 	else
 	{
@@ -487,19 +511,20 @@ function cargar_datos_estudiante($numero_soli,$cedula,$conn2,$conn)
 }
 
 /*============================================================================================================================
-					FUNCION PARA MOSTRAR LOS DATOS DEL ESTUDIANTE PARA VER SI SON CORRECTOS
+					FUNCION PARA MOSTRAR LOS DATOS DEL ESTUDIANTE PARA VER SI SON CORRECTOS PARA LA SECRETARIA
 ==============================================================================================================================*/
 
 
-function mostrar_datos_estudiante($cedula,$nombre,$apellido,$razon,$promedio,$discapacidad,$nacionalidad,$solicitudes,$proceso,$cant_soli,$fecha)
+function mostrar_datos_estudiante_sec($numero_soli,$cedula,$nombre,$apellido,$razon,$promedio,$discapacidad,$nacionalidad,$solicitudes,$proceso,$cant_soli,$fecha)
 {
 	$anio=obtener_anio();
 ?>
         
-	 <form id="Evaluar_estudiante" class="col s12" action="resultado.php" method="POST">
+	 <form id="Evaluar_estudiante" class="col s12" action="guardar.php" method="POST">
 	 					<!--                    todos los datos hidden                       -->
 
                         	<input type="hidden" id="anio" name="anio"  value="<?php echo $anio; ?>">
+                        	<input type="hidden" id="numero_soli" name="numero_soli"  value="<?php echo $numero_soli; ?>">
                         	<input type="hidden" id="Nombre" name="Nombre"  value="<?php echo $nombre; ?>">
                    	        <input type="hidden" id="Apellido" name="Apellido"  value="<?php echo $apellido; ?>">
         					<input type="hidden" id="cedula" name="cedula"  value="<?php echo $cedula; ?>">
@@ -548,7 +573,7 @@ function mostrar_datos_estudiante($cedula,$nombre,$apellido,$razon,$promedio,$di
 
 	                	 <div class="input-field col s6">
 						    <select id="Aval" name="aval">
-						      <option value="" disabled selected>¿Presentó aval?</option>
+						      <option value="" disabled selected>¿Presentó soportes?</option>
 						      <option value="Si">Si</option>
 						      <option value="No">No</option>
 						    </select>
@@ -595,6 +620,104 @@ function mostrar_datos_estudiante($cedula,$nombre,$apellido,$razon,$promedio,$di
                     <div class="row">                       
                         <div class="col m12 offset">
                             <p class="center-align">
+                                <button class="btn btn-large waves-effect waves-light" id="crear" type="submit" value="Guardar" name="accion" title="login">Guardar</button>
+                            </p>
+                        </div>
+                    </div>
+        </form> 
+<?php
+
+}
+
+/*============================================================================================================================
+					FUNCION PARA MOSTRAR LOS DATOS DEL ESTUDIANTE PARA VER SI SON CORRECTOS PARA EL COORDINADOR
+==============================================================================================================================*/
+
+function mostrar_datos_estudiante_coord($aval,$cedula,$nombre,$apellido,$razon,$promedio,$discapacidad,$nacionalidad,$solicitudes,$proceso,$cant_soli,$fecha)
+{
+	$anio=obtener_anio();
+?>
+        
+	 <form id="Evaluar_estudiante" class="col s12" action="resultado.php" method="POST">
+	 					<!--                    todos los datos hidden                       -->
+
+                        	<input type="hidden" id="anio" name="anio"  value="<?php echo $anio; ?>">
+                        	<input type="hidden" id="Nombre" name="Nombre"  value="<?php echo $nombre; ?>">
+                   	        <input type="hidden" id="Apellido" name="Apellido"  value="<?php echo $apellido; ?>">
+        					<input type="hidden" id="cedula" name="cedula"  value="<?php echo $cedula; ?>">
+					        <input type="hidden" id="fecha" name="fecha"  value="<?php echo $fecha; ?>">
+					        <input type="hidden" id="razon" name="razon"  value="<?php echo $razon; ?>">
+					        <input type="hidden" id="aval" name="aval"  value="<?php echo $aval; ?>">
+			                <input type="hidden" id="Promedio" name="Promedio" value="<?php echo $promedio; ?>">
+        					<input type="hidden" id="discapacidad" name="discapacidad"value="<?php echo $discapacidad; ?>">
+        					<input type="hidden" id="nacionalidad" name="nacionalidad" value="<?php echo $nacionalidad; ?>">
+					        <input type="hidden" id="solicitudes" name="solicitudes" value="<?php echo $solicitudes; ?>">
+					        <input type="hidden" id="cant_soli" name="cant_soli"  value="<?php echo $cant_soli; ?>">
+					        <input type="hidden" id="Sol_actual" name="Sol_actual"  value="<?php echo $proceso; ?>">
+
+					    <!--                    todos los datos hidden                       -->
+
+                    <div class="row">
+                        <div class="input-field col s6">
+                            <input id="Nombre" type="text" disabled class="validate"  value="<?php echo $nombre; ?>">
+                            <label for="nombre">Nombre</label>
+                        </div>
+                        <div class="input-field col s6 ">
+                        	<input id="apellido"  type="text" class="validate"  disabled value="<?php echo $apellido; ?>">
+                            <label for="apellido">Apellido</label>                            
+                        </div>
+                    </div> 
+                    <div class="row">
+                        <div class="input-field col s6">
+                            <input id="cedula" type="text" class="validate" disabled value="<?php echo $cedula; ?>">
+                            <label for="cedula">Cédula</label>
+                        </div>   
+                        <div class="input-field col s6">             
+                          	<input id="Promedio" type="text" class="validate" disabled value="<?php echo $promedio; ?>">
+                            <label for="Promedio">Promedio</label>
+                        </div>   
+                    </div>
+                    <div class="row">
+                        <div class="input-field col s6">
+                            <input id="fecha"  type="text" class="validate" disabled value="<?php echo $fecha; ?>">
+                            <label for="fecha">Fecha de Solicitud</label>
+                        </div>
+                        <div class="input-field col s6 ">
+                            <input id="razon" type="text" class="validate" disabled value="<?php echo $razon; ?>">
+                            <label for="razon">Razon</label>
+                        </div>
+                    </div>                
+	                <div class="row">
+		                <div class="input-field col s6 ">
+                            <input id="discapacidad"  type="text" class="validate" disabled value="<?php echo $discapacidad; ?>">
+                            <label for="discapacidad">¿Tiene discapacidad?</label>
+                        </div>
+                        <div class="input-field col s6">
+                            <input id="Sol_actual" type="text" class="validate" disabled value="<?php echo $proceso; ?>">
+                            <label for="Sol_actual">Solicitud Actual</label>
+                        </div>                    
+                    </div> 
+                    <div class="row">
+                    	<div class="input-field col s6">
+                            <input id="solicitudes"  type="text" class="validate" disabled value="<?php echo $solicitudes; ?>">
+                            <label for="solicitudes">Solicitudes anteriores</label>
+                        </div>
+                     <?php
+					if($solicitudes=="Si tiene")
+					{
+					?>  
+                        <div class="input-field col s6 ">
+                            <input id="cant_soli" type="text" class="validate" disabled value="<?php echo $cant_soli; ?>">
+                            <label for="cant_soli">Cantidad de solicitudes</label>
+                        </div>
+                    <?php
+                	}
+                    ?>                    
+                    </div> 
+                    <div class="divider"></div>
+                    <div class="row">                       
+                        <div class="col m12 offset">
+                            <p class="center-align">
                                 <button class="btn btn-large waves-effect waves-light" id="crear" type="submit" value="Evaluar" name="accion" title="login">Evaluar</button>
                             </p>
                         </div>
@@ -604,16 +727,115 @@ function mostrar_datos_estudiante($cedula,$nombre,$apellido,$razon,$promedio,$di
 
 }
 
+/*============================================================================================================================
+					FUNCION PARA SABER SI EL ALUMNO TIENE O NO DOCUMENTOS CONSIGNADOS
+==============================================================================================================================*/
+
+function validar_solicitud($numero_soli,$anio,$fecha,$cedula,$razon,$solicitud_actual,$aval,$conn,$conn2)
+{	
+	$query="SELECT * FROM solicitudes";	
+	$result=$conn->Execute($query);
+	if($result==false)
+	{
+		echo "error al recuperar: ".$conn->ErrorMsg()."<br>" ;
+	}
+	else
+	{		
+		$cont=1;			
+		while(!$result->EOF) 
+		{	
+
+			for ($i=0, $max=$result->FieldCount(); $i<$max; $i++)
+			{
+				$exp=$result->fields[5];				
+			}	
+			if($exp != '-1')
+			{
+				$cont++;
+			}
+			$result->MoveNext();
+		}
+	}	
+	$anio=substr($anio, -2);
+	switch ($solicitud_actual)
+	{
+
+		case 'Retiro':
+				if($aval=="Si")
+				{
+					$periodo=saber_periodo($anio,$fecha,$conn2);
+					$aval="RET-".$cont.".".$anio.".".$periodo;
+					$query2="UPDATE solicitudes SET exp='$aval' WHERE numero_soli= $numero_soli";
+					$result=$conn->Execute($query2);
+					if($result==false)
+					{
+						$bandera=0;}
+					else
+					{	
+						echo $cont;
+					}
+					/*$query="UPDATE razon_proceso SET proceso='$proceso', razon='$razon', puntaje='$puntaje', fecha='$fecha' WHERE ((proceso LIKE '%$proceso%') AND (razon LIKE '%$razon%'))";
+					$result=$conn->Execute($query);
+					if($result==false)
+					{
+						$bandera=0;}
+					else
+					{	
+						$bandera=1;
+					}*/
+
+				}
+				else
+				{
+					$aval=="0";
+					/*llamar a la función para actualizar taba solicitudes de mi tesis*/
+
+				}
+			break;
+		
+		case 'Cambio':
+				if($aval=="Si")
+				{
+					$periodo=saber_periodo($anio,$fecha,$conn2);
+					//$aval="CE-".+.$cont.+.".".+.$anio.+.".".+.$periodo;
+					/*llamar a la función para actualizar taba solicitudes de mi tesis*/
+
+				}
+				else
+				{
+					$aval=="0";		
+					/*llamar a la función para actualizar taba solicitudes de mi tesis*/
+
+				}
+			break;
+
+		case 'Reingreso':
+				if($aval=="Si")
+				{
+					$periodo=saber_periodo($anio,$fecha,$conn2);
+					//$aval="RCC-".+.$cont.+.".".+.$anio.+.".".+.$periodo;
+					/*llamar a la función para actualizar taba solicitudes de mi tesis*/
+				}
+				else
+				{
+					$aval=="0";
+					/*llamar a la función para actualizar taba solicitudes de mi tesis*/
+
+				}
+			break;		
+	}
+
+}
 /*===========================================================================================================================
 					FUNCION PARA EL LOGIN DE LOS ESTUDIANTES
-============================================================================================================================*/
+============================================================================================================================
 
 function mostrar($cedula,$nombre,$apellido,$email,$celular,$direccion,$promedio,$discapacidad,$nacionalidad,$solicitudes2,$proceso)
 {
 //trabajar aquí
 	mostrar_datos_estudiante($cedula,$nombre,$apellido,$email,$celular,$direccion,$promedio,$discapacidad,$nacionalidad,$solicitudes2,$proceso);
 }
-/*============================================================================================================================
+=============================================================================================================================
 					FUNCION PARA VER LA CANTIDAD DE SOLICITUDES REALIZADAS POR UN ESTUDIANTE EN LA BD DE CONTROL DE E.
 ============================================================================================================================*/
 
@@ -854,7 +1076,7 @@ return $fecha;
 ==============================================================================================================================*/
 function obtener_anio()
 {
-	date_default_timezone_set("America/Caracas" ) ; 
+	date_default_timezone_set("America/Caracas"); 
 	$tiempo = getdate(time());	
 	$year = $tiempo['year'];
 	$dia = $tiempo['wday']; 
@@ -899,6 +1121,36 @@ function tiempo_solicitud_retiro($anio,$fecha,$conn2)
 		$cant_dias=date_diff($fecha_fin_ret, $fecha);	
 	}
 	return $cant_dias;
+	$conn2->Close();
+}
+
+/*============================================================================================================================
+					FUNCION PARA SABER el periodo en el que se hace la solicitud
+==============================================================================================================================*/
+
+function saber_periodo($anio,$fecha,$conn2)
+{
+	$query="SELECT * FROM periodo WHERE (ano LIKE '%$anio%')";	
+	$result=$conn2->Execute($query);
+	if($result==false)
+	{echo "error al recuperar: ".$conn2->ErrorMsg()."<br>" ;}
+	else
+	{
+		while(!$result->EOF) 
+		{			
+			for ($i=0, $max=$result->FieldCount(); $i<$max; $i++)
+			{
+				$fecha_inicio_sem=$result->fields['3'];
+				$fecha_fin_sem=$result->fields['4'];
+				if(valida_fecha($fecha_inicio_sem, $fecha_fin_sem, $fecha))
+				{
+					$periodo=$result->fields['1'];
+				}
+			}
+			$result->MoveNext();
+		}
+	}
+	return $periodo;
 	$conn2->Close();
 }
 /*============================================================================================================================
@@ -1084,48 +1336,59 @@ function mostrar_decision($fecha_solicitud,$cedula,$pros_aca,$razon,$solicitud_a
 			        <input type="hidden" id="medidas" name="medidas"  value="<?php echo $medidas_resul; ?>">
 			        <input type="hidden" id="aval" name="aval" value="<?php echo $razon_aval ?>"> 
 			        <input type="hidden" id="decision" name="decision" value="<?php echo $decision ?>">
+
                     <div class="row">
-                        <div class="input-field col s12 m6 offset-m3">
+                        <div class="input-field col s12 m6">
                             <input type="text" class="validate" disabled value="<?php echo $nombre." ".$apellido ; ?>">
                             <label>El estudiante: </label>
                         </div>
-                        <div class="input-field col s12 m6 offset-m3">
+                        <div class="input-field col s12 m6">
                             <input disabled type="text" class="validate" value="<?php echo $cedula?>">
                             <label >Portador de la cedula: </label>
                         </div>
-                        <div class="input-field col s12 m6 offset-m3">
+                     </div>
+                     <div class="row">
+                        <div class="input-field col s12 m6">
                             <input type="text" class="validate" disabled value="<?php echo $solicitud_actual ?>">
                             <label >Quien ha solicitado un: </label>
                         </div>
-                        <div class="input-field col s12 m6 offset-m3">
+                        <div class="input-field col s12 m6">
                             <input type="text" class="validate" disabled value="<?php echo $razon ?>">
                             <label>A razon de: </label>
                         </div>
-                        <div class="input-field col s12 m6 offset-m3">
+                     </div>
+                     <div class="row">
+                        <div class="input-field col s12 m6">
                             <input  type="text" class="validate" disabled value="<?php echo $tiempo_soli ?>">                            
                         </div>
-                        <div class="input-field col s12 m6 offset-m3">
+                        <div class="input-field col s12 m6">
                             <input type="text" class="validate" disabled value="<?php echo $solicitudes_anteriores; ?>">                            
                         </div>
-                        <div class="input-field col s12 m6 offset-m3">
+                     </div>
+                     <div class="row">
+                        <div class="input-field col s12 m6">
                             <input disabled type="text" class="validate" value="<?php echo $pros_aca; ?>">                            
                         </div>
-                        <div class="input-field col s12 m6 offset-m3">
+                        <div class="input-field col s12 m6">
                             <input type="text" class="validate" disabled value="<?php echo $medidas_resul; ?>">                            
                         </div>
-                        <div class="input-field col s12 m6 offset-m3">
+                    </div>
+                    <div class="row">
+                        <div class="input-field col s12 m6">
                             <input type="text" class="validate" disabled value="<?php echo $razon_aval ?>">
                             <label>Y </label>
                         </div>
-                        <div class="input-field col s12 m6 offset-m3">
+                        <div class="input-field col s12 m6 ">
                             <input disabled type="text" class="validate" value="<?php echo $decision ?>">
                             <label >Por lo tanto, mediante la aplicación del maximo valor esperado, su solicitud esta: </label>
                         </div>
+                    </div>
+                    <div class="row">
                          <?php
 							If($decision="Aprobada" || $decision="Reprobada")
 							{
 							?>  							        
-							    <div class="input-field col s6 offset-m3">             
+							    <div class="input-field col s12 m6">             
 		                          <select class="browser-default" id="acuerdo" name="acuerdo">
 		                            <option value="" disabled selected>¿Está de acuerdo con la decisión?</option>
 		                            <option value="Si">Si</option>
@@ -1139,7 +1402,7 @@ function mostrar_decision($fecha_solicitud,$cedula,$pros_aca,$razon,$solicitud_a
 									If($decision="Indefinida")
 									{
 							?>   
-								<div class="input-field col s12"> 
+								<div class="input-field col s12 m6"> 
 							        <select class="browser-default" id="desicion2" name="desicion2">
 							        <option value="" disabled selected>Ya que el sistema no pudo decidir, tome la decision usted </option>>
 							        <option value="Aprobado">Aprobado</option>
@@ -1151,9 +1414,8 @@ function mostrar_decision($fecha_solicitud,$cedula,$pros_aca,$razon,$solicitud_a
 							}
 							}
 							?> 
-                    </div>
-				      <div class="row">
-				        <div class="input-field col s12 m6 offset-m3">
+                    
+				        <div class="input-field col s12 m6 ">
 				          <textarea id="observaciones" name="observaciones" class="materialize-textarea"></textarea>
 				          <label for="observaciones">Observaciones</label>
 				        </div>
@@ -1163,7 +1425,7 @@ function mostrar_decision($fecha_solicitud,$cedula,$pros_aca,$razon,$solicitud_a
                     <div class="row">                       
                         <div class="col m12 offset">
                             <p class="center-align">
-                                <button class="btn btn-large waves-effect waves-light" id="crear" type="submit" value="Evaluar" name="accion" title="login">Evaluar</button>
+                                <button class="btn btn-large waves-effect waves-light" id="crear" type="submit" value="Evaluar" name="accion" title="login">DECISION</button>
                             </p>
                         </div>
                     </div>
@@ -1566,6 +1828,11 @@ function cerrar_sesion()
 	header("location: ../index.php"); 
 
 }
+
+/*===========================================================================================================================
+ FUNCION PARA VISUALIZAR ANTIGUAS DECISIONES	
+ ======================================================================================================================*/
+
 function estudiar_decision($fecha,$cedula,$solicitud,$conn,$conn2)
 {
 
@@ -1613,57 +1880,63 @@ function estudiar_decision($fecha,$cedula,$solicitud,$conn,$conn2)
 	}
 	
 ?>		
-	<form class="col s12" id="decision" action="ingresar.php" method="POST">           	        
+		<form class="col s12" id="decision" method="POST">           	        
                     <div class="row">
-                        <div class="input-field col s12 m6 offset-m3">
+                        <div class="input-field col s12 m6">
                             <input type="text" class="validate" disabled value="<?php echo $nombre." ".$apellido ; ?>">
                             <label>El estudiante: </label>
                         </div>
-                        <div class="input-field col s12 m6 offset-m3">
+                        <div class="input-field col s12 m6">
                             <input disabled type="text" class="validate" value="<?php echo $cedula?>">
                             <label >Portador de la cedula: </label>
                         </div>
-                        <div class="input-field col s12 m6 offset-m3">
+                    </div>
+                   	<div class="row">
+                        <div class="input-field col s12 m6">
                             <input type="text" class="validate" disabled value="<?php echo $solicitud_actual ?>">
                             <label >Quien ha solicitado un: </label>
                         </div>
-                        <div class="input-field col s12 m6 offset-m3">
+                        <div class="input-field col s12 m6">
                             <input type="text" class="validate" disabled value="<?php echo $razon ?>">
                             <label>A razon de: </label>
                         </div>
-                        <div class="input-field col s12 m6 offset-m3">
+                    </div>
+                    <div class="row">
+                        <div class="input-field col s12 m6">
                             <input  type="text" class="validate" disabled value="<?php echo $tiempo_soli ?>">                            
                         </div>
-                        <div class="input-field col s12 m6 offset-m3">
+                        <div class="input-field col s12 m6">
                             <input type="text" class="validate" disabled value="<?php echo $solicitudes_anteriores; ?>">                            
                         </div>
-                        <div class="input-field col s12 m6 offset-m3">
+                    </div>
+                    <div class="row">
+                        <div class="input-field col s12 m6">
                             <input disabled type="text" class="validate" value="<?php echo $pros_aca; ?>">                            
                         </div>
-                        <div class="input-field col s12 m6 offset-m3">
+                        <div class="input-field col s12 m6">
                             <input type="text" class="validate" disabled value="<?php echo $medidas_resul; ?>">                            
                         </div>
-                        <div class="input-field col s12 m6 offset-m3">
+                    </div>
+                    <div class="row">
+                        <div class="input-field col s12 m6">
                             <input type="text" class="validate" disabled value="<?php echo $razon_aval ?>">
                             <label>Y </label>
                         </div>
-                        <div class="input-field col s12 m6 offset-m3">
+                        <div class="input-field col s12 m6">
                             <input disabled type="text" class="validate" value="<?php echo $decision ?>">
                             <label >Por lo tanto, mediante la aplicación del maximo valor esperado, su solicitud esta: </label>
                         </div>  
-                        <div class="input-field col s12 m6 offset-m3">
+                    </div>
+                    <div class="row">
+                        <div class="input-field col s12 m6">
                             <input disabled type="text" class="validate" value="<?php echo $acuerdo ?>">
                             <label >¿El coordinador estuvo de acuerdo?: </label>
                         </div>                                             
-                    </div>
-				      <div class="row">
-				        <div class="input-field col s12 m6 offset-m3">
-				          <textarea id="observaciones" disabled name="observaciones" class="materialize-textarea" value="<?php echo $observaciones ?>"></textarea>
+                        <div class="input-field col s12 m6">
+				          <textarea id="observaciones" disabled name="observaciones" class="materialize-textarea"><?php echo $observaciones ?></textarea>
 				          <label for="observaciones">Observaciones</label>
 				        </div>
-				      </div>
-                   </div>   
-                    
+				      </div>                                      
         </form> 
 	
 <?php
