@@ -26,7 +26,7 @@ $(document).ready(function(){
 				})
 
 				var datatable = $('#mytable').DataTable({
-				       ajax: "../prueba.php",
+				       ajax: "../procesos/funciones.php",
 				       "sAjaxDataProp": "",
 						"bProcessing": true, 
 				         columns: 

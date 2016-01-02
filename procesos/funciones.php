@@ -146,18 +146,13 @@ function loguear_coord($usuario,$contraseña,$conn)
 			$result->MoveNext();							
 		}
 		if($id==2)
-			{ 			
-				
-				/*$usuario=base64_encode($usuario);
-				$nivel=base64_encode($nivel);*/
-				
+			{ 							
 				header("location: ../coordinacion_principal.php"); 
 			}
 			else
 			{		
-					$id=1;
-					header("location: ../index.php?id=$id");
-				
+				$id=1;
+				header("location: ../index.php?id=$id");				
 			}
 	
 	}
@@ -257,8 +252,9 @@ function mostrar_proceso_sec($proceso,$conn,$conn2)
 					$j++;
 					
 				} 
-				//header('Content-type: application/json');
+				header('Content-type: application/json');
 				return json_encode($data);
+				
 
 			}
 

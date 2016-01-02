@@ -1,7 +1,7 @@
 <?php 
-	session_start();
+	/*session_start();
 	$nivel=$_SESSION['nivel'];
-	$bandera=$_SESSION['bandera'];  
+	$bandera=$_SESSION['bandera']; */ 
  	include('../config.php');
  	include('funciones.php');	
     if(isset($_POST['accion'])){ $accion=$_POST['accion']; 
