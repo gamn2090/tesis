@@ -13,8 +13,6 @@ session_start();
     <link href="../css/style.css" type="text/css" rel="stylesheet" media="screen,projection"/>
     <link rel="stylesheet" href="../css/main.css">
     <link rel="stylesheet" href="../css/font.css">
-    <script type="text/javascript" src="../jquery/probandini.js"></script>
-    <script type="text/javascript" src="jquery/jquery-2.1.1.js"></script>
  <?php
 	include ("../procesos/funciones.php");
 	include ("../config.php");
@@ -131,7 +129,7 @@ session_start();
   </footer>
 
 
-  <!--  Scripts-->
+  <!--  Scripts--> 
   <script src="https://code.jquery.com/jquery-2.1.4.min.js"></script>
   <script src="../js/materialize.js"></script>
   <script src="../js/init.js"></script>

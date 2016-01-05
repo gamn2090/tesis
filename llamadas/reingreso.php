@@ -53,6 +53,7 @@ $bandera=$_SESSION['bandera'];
                        },
                         "sAjaxDataProp": "",
                         "processing": true,
+                        "pageLength": 20,
                        // "serverSide": true,
                          columns: 
                          [

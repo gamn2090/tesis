@@ -217,6 +217,61 @@ function cargar_datos_coord($usuario,$conn)
 	}
 	$conn->Close();
 }
+
+/*===========================================================================================================================
+ FUNCION PARA VISUALIZAR LA BASE DE DATOS HISTORICA  	
+ ======================================================================================================================*/
+function visualizar_historico($nivel,$conn)
+{
+			$query="SELECT * FROM decisiones";	
+			$result=$conn->Execute($query);		
+			if($result==false)
+			{
+				echo "error al recuperar: ".$conn->ErrorMsg()."<br>" ;
+			}
+			else
+			{	$j=0;
+				while(!$result->EOF) 
+				{			
+					for ($i=0, $max=$result->FieldCount(); $i<$max; $i++)
+					{
+							$cedula=$result->fields[0];
+							$fecha=$result->fields[1];					
+							$solicitud=$result->fields[5];
+							$razon=$result->fields[2];	
+							$resultado=$result->fields[9];
+							$link="<a href=\"estudiar_historico.php?id=".$cedula."&soli=".$solicitud."&fecha=".$fecha."\" target='_blank'>Evaluar</a>";							
+							$result->MoveNext();											
+							break;	
+					}
+					
+					if($nivel==sha1(md5("OverNineThousand")))
+					{
+						$data[$j]=array("cedula"=>$cedula,
+										"solicitud"=> $solicitud,
+										"fecha"=>$fecha,
+										"razon"=> $razon,
+										"resultado"=>$resultado,
+										"link"=>$link);
+					$j++;
+					}
+					else
+					{
+						$data[$j]=array("cedula"=>$cedula,
+										"solicitud"=> $solicitud,
+										"fecha"=>$fecha,
+										"razon"=> $razon,
+										"resultado"=>$resultado);
+									
+					$j++;
+					}
+					header('Content-type: application/json');
+					return json_encode($data);
+				}
+			
+			}
+				$conn->Close();			
+}
 /*===========================================================================================================================
 					FUNCION PARA MOSTRAR LOS PROCESOS EN TABLAS
 ============================================================================================================================*/
@@ -332,10 +387,7 @@ function mostrar_proceso($proceso,$bandera,$nivel,$conn,$conn2)
 					$j++;
 				} 
 				header('Content-type: application/json');
-				return json_encode($data);
-				
-			  
-				
+				return json_encode($data);				
 			}
 	}
 	$conn->Close();
@@ -370,7 +422,7 @@ function cargar_datos_estudiante($numero_soli,$cedula,$nivel,$conn2,$conn)
 
 	$solicitudes1=buscar_control_estudio($cedula,$conn2,$proceso);
 	$solicitudes2=buscar_historico($cedula,$conn,$proceso);
-	if(($solicitudes1=='no tiene') && ($solicitudes2=='no tiene'))
+	if(($solicitudes1==0) && ($solicitudes2==0))
 	{
 		$solicitudes="No tiene";	
 	}
@@ -848,11 +900,11 @@ function buscar_control_estudio($cedula,$conn2,$proceso)
 					}
 					if( $solicitudes==$proceso)
 						{
-							$solicitudes1="si tiene";	
+							$solicitudes1=1;	
 						}
 						else
 						{
-							$solicitudes1="no tiene";	
+							$solicitudes1=0;	
 												
 						}
 					$result->MoveNext();
@@ -885,11 +937,11 @@ function buscar_historico($cedula,$conn,$proceso)
 					}
 					if( $solicitudes==$proceso)
 						{
-							$solicitudes2="si tiene";	
+							$solicitudes2=1;	
 						}
 						else
 						{
-							$solicitudes2="no tiene";	
+							$solicitudes2=0;	
 												
 						}
 					$result->MoveNext();
@@ -1708,76 +1760,6 @@ function ingresar_historico($exp,$cedula,$fecha_solicitud,$razon,$promedio,$soli
 	
 return $bandera;
 $conn->Close();
-}
-
-/*===========================================================================================================================
- FUNCION PARA VISUALIZAR LA BASE DE DATOS HISTORICA  	
- ======================================================================================================================*/
-function visualizar_historico($nivel,$conn)
-{
-			$query="SELECT * FROM decisiones";	
-			$result=$conn->Execute($query);		
-			if($result==false)
-			{
-				echo "error al recuperar: ".$conn->ErrorMsg()."<br>" ;
-			}
-			else
-			{	
-			?>
-					<table class="bordered" border="0" cellspacing=25 cellpadding=2 style="font-size: 10pt">
-					<tr>
-					<td><font face="verdana"><b>Cedula</b></font></td>					
-					<td><font face="verdana"><b>Solicitud</b></font></td>
-					<td><font face="verdana"><b>Fecha de la solicitud</b></font></td>						
-                    <td><font face="verdana"><b>Razon</b></font></td>		
-					<td><font face="verdana"><b>Resultado</b></font></td>
-					<td><font face="verdana"><b>           </b></font></td>	                    	                    
-					</tr>
-			<?php					
-							
-				while(!$result->EOF) 
-				{			
-					for ($i=0, $max=$result->FieldCount(); $i<$max; $i++)
-					{
-							$cedula=$result->fields[0];
-							$fecha=$result->fields[1];					
-							$solicitud=$result->fields[5];
-							$razon=$result->fields[2];	
-							$resultado=$result->fields[9];							
-																			
-							
-							if($nivel==sha1(md5("OverNineThousand")))
-							{
-								echo "<tr><td width=\"200\"><font face=\"verdana\">" .$cedula  . "</font></td>";					
-								echo "<td width=\"200\"><font face=\"verdana\">" .$solicitud. "</font></td>";
-								echo "<td width=\"200\"><font face=\"verdana\">" .$fecha. "</font></td>";
-								echo "<td width=\"200\"><font face=\"verdana\">" .$razon. "</font></td>";
-								echo "<td width=\"200\"><font face=\"verdana\">" .$resultado . "</font></td>";
-								echo "<td width=\"200\"><font face=\"verdana\"><a href=\"estudiar_historico.php?id=".$cedula."&soli=".$solicitud."&fecha=".$fecha."\" target='_blank'>Evaluar</a></p>"; "</font></td></tr>";							  
-								
-								$result->MoveNext();											
-								break;
-
-							}
-							else
-							{
-								echo "<tr><td width=\"200\"><font face=\"verdana\">" .$cedula  . "</font></td>";					
-								echo "<td width=\"200\"><font face=\"verdana\">" .$solicitud. "</font></td>";
-								echo "<td width=\"200\"><font face=\"verdana\">" .$fecha. "</font></td>";
-								echo "<td width=\"200\"><font face=\"verdana\">" .$razon. "</font></td>";
-								echo "<td width=\"200\"><font face=\"verdana\">" .$resultado . "</font></td>";
-								$result->MoveNext();											
-								break;
-
-							}
-					}
-				}
-			  
-			?>
-				</table>
-			<?php
-			}
-				$conn->Close();			
 }
 
 function cerrar_sesion()
