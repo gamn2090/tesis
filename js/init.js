@@ -22,22 +22,8 @@ $(document).ready(function(){
 					var url = $(this).attr('data-url');
 					carga(url);
 					$("#imagen").attr("src","../img/retiro.jpg");
-					$('#nombre').html('RETIROS ACADÉMICOS');					
-				})
-
-				var datatable = $('#mytable').DataTable({
-				       ajax: "../procesos/funciones.php",
-				       "sAjaxDataProp": "",
-						"bProcessing": true, 
-				         columns: 
-				         [
-				            {data:"cedula"},
-				            {data:"numero"},
-				            {data:"razon"},
-				            {data:"link"}			            
-      					  ]    
-      					     
-				    });		  
+					$('#nombre').html('RETIROS ACADÉMICOS');
+				})						
 
 				$("#reingresos").on('click', function() {
 					var url = $(this).attr('data-url');
@@ -49,7 +35,6 @@ $(document).ready(function(){
 				$("#CDE").on('click', function() {
 					var url = $(this).attr('data-url');					
 					carga(url);
-					console.log(url);
 					$("#imagen").attr("src","../img/cambio_especialidad.jpg");
 					$('#nombre').html('CAMBIO DE ESPECIALIDAD');
 				})
@@ -93,7 +78,7 @@ $(document).ready(function(){
 					$('#nombre2').html('CAMBIAR VALORES DE DECISIONES DE REINGRESOS');
 				})	
 
-				
+});				
 
 			function carga(pagina,img){				
 				$("#principal").load(pagina);	
@@ -103,6 +88,6 @@ $(document).ready(function(){
 				$("#principal2").load(pagina);
 			};
 				
-});
+
 		
 				

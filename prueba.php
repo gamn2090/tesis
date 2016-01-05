@@ -1,7 +1,7 @@
 <?php	
 include "config.php";			
 			
-			$query2="SELECT * FROM solicitudes";
+			$query2="SELECT * FROM solicitudes WHERE proceso LIKE '%Retiro%'";
 			$result2=$conn->Execute($query2);			
 			if($result2==false)
 			{
@@ -19,7 +19,7 @@ include "config.php";
 						$cedula=$result2->fields[0];
 						$numero_sol=$result2->fields[1];
 						$razon=$result2->fields[2];	
-						$link="<a href=\"llamadas/evaluar.php?id=".$cedula."&numero=".$numero_sol."\" target='_blank'>Evaluar</a>";						
+						$link="<a href=\"evaluar.php?id=".$cedula."&numero=".$numero_sol."\" target='_blank'>Evaluar</a>";						
 						$result2->MoveNext();											
 						break;												
 					}

@@ -20,12 +20,7 @@ if($usuario!= NULL)
 
   <!-- CSS  -->
   <link rel="stylesheet" type="text/css" href="../css/jquery.dataTables.css">
-    <link rel="stylesheet" type="text/css" href="../css/dataTables.editor.css">
-    <script src="https://code.jquery.com/jquery-2.1.4.min.js"></script>
-    <script src="../js/init.js"></script>
-    <script type="text/javascript" language="javascript" src="../js/jquery.dataTables.js"></script>
-    <script type="text/javascript" language="javascript" src="../js/dataTables.tableTools.js"></script>
-    <script type="text/javascript" language="javascript" src="../js/dataTables.editor.js"></script>
+  <!--<link rel="stylesheet" type="text/css" href="../css/dataTables.editor.css">  -->
   <link href="https://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet">
   <link href="../css/materialize.css" type="text/css" rel="stylesheet" media="screen,projection"/>
   <link href="../css/style.css" type="text/css" rel="stylesheet" media="screen,projection"/>
@@ -163,10 +158,12 @@ if($usuario!= NULL)
 
 
   <!--  Scripts-->
-  <script src="../js/materialize.js"></script>
-
-
-
+  <script src="https://code.jquery.com/jquery-2.1.4.min.js"></script>
+  <script type="text/javascript" language="javascript" src="../js/jquery.dataTables.js"></script>
+  <!--<script type="text/javascript" language="javascript" src="../js/dataTables.tableTools.js"></script>
+  <script type="text/javascript" language="javascript" src="../js/dataTables.editor.js"></script>-->
+  <script src="../js/materialize.js"></script> 
+  <script src="../js/init.js"></script>
   </body>
 </html>
 <?php

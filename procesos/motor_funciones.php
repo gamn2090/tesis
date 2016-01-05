@@ -1,7 +1,7 @@
 <?php 
-	/*session_start();
+	session_start();
 	$nivel=$_SESSION['nivel'];
-	$bandera=$_SESSION['bandera']; */ 
+	$bandera=$_SESSION['bandera']; 
  	include('../config.php');
  	include('funciones.php');	
     if(isset($_POST['accion'])){ $accion=$_POST['accion']; 
@@ -50,15 +50,29 @@
 			{	
 				$usuario = $_POST['usuario'];
 				$contraseña = $_POST['contraseña'];
-				
-
 			//var_dump($conn); 						
 			loguear_coord($usuario,$contraseña,$conn);			
 			}			
  		break; 		
  		case 'Evaluar Bachiller': /*evaluar bachiller*/
- 		 	mostrar($cedula,$nombre,$apellido,$email,$celular,$direccion,$promedio,$discapacidad,$nacionalidad,$solicitudes2,$proceso);
- 		break;		 			
+ 		 		mostrar($cedula,$nombre,$apellido,$email,$celular,$direccion,$promedio,$discapacidad,$nacionalidad,$solicitudes2,$proceso);
+ 		break;	
+ 		case 'mostrar_proceso_ret': 				
+ 				$array=mostrar_proceso('Retiro',$bandera,$nivel,$conn,$conn2);
+ 				echo $array;
+ 		break;	
+ 		case 'mostrar_proceso_rei':
+ 				$array=mostrar_proceso('Reingreso',$bandera,$nivel,$conn,$conn2);
+ 				echo $array;
+ 		break;
+ 		case 'mostrar_proceso_cde': 
+ 				$array=mostrar_proceso('Cambio',$bandera,$nivel,$conn,$conn2);
+ 				echo $array;			
+ 		break;
+ 		case 'mostrar_historico': 
+ 				$array=visualizar_historico($nivel,$conn);
+ 				echo $array;			
+ 		break;
 			}
 	}//fin isset[$_post[accion]]
 

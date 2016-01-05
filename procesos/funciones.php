@@ -141,8 +141,7 @@ function loguear_coord($usuario,$contraseña,$conn)
 					$_SESSION['bandera']=$prueba1;
 								
 				}
-			}		
-				
+			}				
 			$result->MoveNext();							
 		}
 		if($id==2)
@@ -222,18 +221,26 @@ function cargar_datos_coord($usuario,$conn)
 					FUNCION PARA MOSTRAR LOS PROCESOS EN TABLAS
 ============================================================================================================================*/
 
-function mostrar_proceso_sec($proceso,$conn,$conn2)
+function mostrar_proceso($proceso,$bandera,$nivel,$conn,$conn2)
 {   if($proceso=="Retiro" || $proceso=="Reingreso")
 	{		
+		if($nivel==$bandera)
+		{
+			$query="SELECT * FROM solicitudes WHERE (proceso LIKE '%$proceso%' AND exp NOT LIKE '-1')";
+			$result=$conn->Execute($query);	
+		}
+		else
+		{
 			$query="SELECT * FROM solicitudes WHERE (proceso LIKE '%$proceso%' AND exp LIKE '-1')";
-			$result=$conn->Execute($query);			
+			$result=$conn->Execute($query);	
+		}		
 			if($result==false)
 			{
 				echo "error al recuperar: ".$conn->ErrorMsg()."<br>" ;
 			}
 			else
 			{		
-
+				$j=0;
 				while(!$result->EOF) 
 				{	
 					for ($i=0, $max=$result->FieldCount(); $i<$max; $i++)
@@ -241,7 +248,9 @@ function mostrar_proceso_sec($proceso,$conn,$conn2)
 						$cedula=$result->fields[0];
 						$numero_sol=$result->fields[1];
 						$razon=$result->fields[2];	
-						$link="<a href=\"llamadas/evaluar.php?id=".$cedula."&numero=".$numero_sol."\" target='_blank'>Evaluar</a>";						
+						$cedula2=base64_encode($cedula);
+						$numero_sol2=base64_encode($numero_sol);
+						$link="<a href=\"evaluar.php?id=".$cedula2."&numero=".$numero_sol2."\" target='_blank'>Evaluar</a>";						
 						$result->MoveNext();											
 						break;												
 					}
@@ -250,292 +259,88 @@ function mostrar_proceso_sec($proceso,$conn,$conn2)
 									"razon"=> $razon,
 									"link"=>$link);
 					$j++;
-					
+				} 
+				header('Content-type: application/json');
+				return json_encode($data);
+			}
+	}
+	else
+	{
+			$query2="SELECT * FROM solicitud_cde";	
+			$result=$conn->Execute($query2);
+			if($result==false)
+			{
+				echo "error al recuperar: ".$conn->ErrorMsg()."<br>" ;
+			}
+			else
+			{				
+				$j=0;
+				while(!$result->EOF) 
+				{			
+					for ($i=0, $max=$result->FieldCount(); $i<$max; $i++)
+					{
+						$numero_sol=$result->fields[1];
+						$cedula=$result->fields[0];
+						$razon=$result->fields[2];	
+						$carrera_actual=$result->fields[3];
+						$carrera_siguiente=$result->fields[4];
+						$cedula2=base64_encode ($cedula);
+						$numero_sol2=base64_encode ($numero_sol);
+						$link="<a href=\"evaluar.php?id=".$cedula2."&numero=".$numero_sol2."\" target='_blank'>Evaluar</a>";							
+						$query3="SELECT * FROM esp WHERE codigo LIKE '%$carrera_actual%'";
+						$result=$conn2->Execute($query3);
+						if($result==false)
+						{
+							echo "error al recuperar: ".$conn2->ErrorMsg()."<br>" ;
+						}
+						else
+						{	
+							while(!$result->EOF) 
+							{			
+								for ($i=0, $max=$result->FieldCount(); $i<$max; $i++)
+								{	
+									$carrera_actual=$result->fields[1];
+								}
+								break;
+							}
+						}	
+						$query4="SELECT * FROM esp WHERE codigo LIKE '%$carrera_siguiente%'";
+						$result=$conn2->Execute($query4);
+						if($result==false)
+						{
+							echo "error al recuperar: ".$conn2->ErrorMsg()."<br>" ;
+						}
+						else
+						{	
+							while(!$result->EOF) 
+							{			
+								for ($i=0, $max=$result->FieldCount(); $i<$max; $i++)
+								{	
+									$carrera_siguiente=$result->fields[1];
+								}
+								break;
+							}
+						}		
+						$result->MoveNext();											
+						break;	
+					}
+					$data[$j]=array("cedula"=>$cedula,
+									"numero"=> $numero_sol,
+									"carrera_a"=> $carrera_actual,
+									"carrera_s"=> $carrera_siguiente,
+									"link"=>$link);
+					$j++;
 				} 
 				header('Content-type: application/json');
 				return json_encode($data);
 				
-
-			}
-
-	}
-	else
-	{
-			$query2="SELECT * FROM solicitud_cde";	
-			$result=$conn->Execute($query2);
-			if($result==false)
-			{
-				echo "error al recuperar: ".$conn->ErrorMsg()."<br>" ;
-			}
-			else
-			{	
-			 
-				?>
-					<table border="0" class="bordered" cellspacing=25 cellpadding=2 style="font-size: 10pt">
-					<tr>
-					<td><font face="verdana"><b>Cedula</b></font></td>
-                    <td><font face="verdana"><b>Solicitud</b></font></td>
-                    <td><font face="verdana"><b>Razon</b></font></td>		
-					<td><font face="verdana"><b>Carrera Actual</b></font></td>	
-                    <td><font face="verdana"><b>Carrera Siguiente</b></font></td>
-                    <td><font face="verdana"><b>                 </b></font></td>
-					</tr>
-					<?php
-					
-							
-				while(!$result->EOF) 
-				{			
-					for ($i=0, $max=$result->FieldCount(); $i<$max; $i++)
-					{
-							
-							$numero_sol=$result->fields[1];
-							$cedula=$result->fields[0];
-							$razon=$result->fields[2];	
-							$carrera_actual=$result->fields[3];
-							$carrera_siguiente=$result->fields[4];
-							$cedula2=base64_encode ($cedula);
-							$numero_sol2=base64_encode ($numero_sol);
-							//$carrera_actual=base64_encode ($carrera_actual);
-							//$carrera_siguiente=base64_encode ($carrera_siguiente);	
-						$query3="SELECT * FROM esp WHERE codigo LIKE '%$carrera_actual%'";
-						$result=$conn2->Execute($query3);
-						if($result==false)
-						{
-							echo "error al recuperar: ".$conn2->ErrorMsg()."<br>" ;
-						}
-						else
-						{	
-							while(!$result->EOF) 
-							{			
-								for ($i=0, $max=$result->FieldCount(); $i<$max; $i++)
-								{	
-									$carrera_actual=$result->fields[1];
-								}
-								break;
-							}
-						}	
-						$query4="SELECT * FROM esp WHERE codigo LIKE '%$carrera_siguiente%'";
-						$result=$conn2->Execute($query4);
-						if($result==false)
-						{
-							echo "error al recuperar: ".$conn2->ErrorMsg()."<br>" ;
-						}
-						else
-						{	
-							while(!$result->EOF) 
-							{			
-								for ($i=0, $max=$result->FieldCount(); $i<$max; $i++)
-								{	
-									$carrera_siguiente=$result->fields[1];
-								}
-								break;
-							}
-						}						
-														
-								echo "<tr><td width=\"200\"><font face=\"verdana\">" .$cedula  . "</font></td>";					
-								echo "<td width=\"200\"><font face=\"verdana\">" .$razon . "</font></td>";
-								echo "<td width=\"200\"><font face=\"verdana\">" .$numero_sol. "</font></td>";
-								echo "<td width=\"200\"><font face=\"verdana\">" .$carrera_actual . "</font></td>";
-								echo "<td width=\"200\"><font face=\"verdana\">" .$carrera_siguiente . "</font></td>";
-
-								$result->MoveNext();											
-								break;					
-							
-							
-					}
-				}
 			  
-				?>
-				</table>
-				<?php
+				
 			}
 	}
 	$conn->Close();
 	$conn2->Close();
 }
-
-function mostrar_proceso_coord($proceso,$conn,$conn2,$offset)
-{   if($proceso=="Retiro" || $proceso=="Reingreso")
-	{		
-			$limit=3;
-			$query2="SELECT * FROM solicitudes WHERE (proceso LIKE '%$proceso%' AND exp NOT LIKE '-1') ORDER BY fecha_solicitud";
-			$result2=$conn->Execute($query2);
-			$query="SELECT * FROM solicitudes WHERE (proceso LIKE '%$proceso%' AND exp NOT LIKE '-1') ORDER BY fecha_solicitud LIMIT $limit OFFSET $offset";	
-			$result=$conn->Execute($query);	
-			if($result==false)
-			{
-				echo "error al recuperar: ".$conn->ErrorMsg()."<br>" ;
-			}
-			else
-			{		
-			 	
-			 	$total=$result2->RowCount();				
-		 		$pages=$total/$limit;
-		 		$pages= ceil($pages);
-
-		 		$page = min($pages, filter_input(INPUT_GET, 'page', FILTER_VALIDATE_INT, array(
-		        'options' => array(
-		            'default'   => 1,
-		            'min_range' => 1,
-		        ),
-		    	)));
-
-		    	//$offset = ($page - 1)  * $limit;
-		    	$start = $offset+1;
-    			$end = min(($offset + $limit), $total);
-
-    			
-				
-				/*$stmt = $conn->prepare("SELECT * FROM solicitudes WHERE (proceso LIKE '%$proceso%') ORDER BY fecha_solicitud LIMIT :limit OFFSET :offset");
-
-				// Bind the query params
-			    $stmt->bindParam(':limit', $limit, PDO::PARAM_INT);
-			    $stmt->bindParam(':offset', $offset, PDO::PARAM_INT);
-			   // $stmt->execute();*/
-
-				?>
-					<table class="bordered" border="0" cellspacing=25 cellpadding=2 style="font-size: 10pt">
-					<tr>
-					<td><font face="verdana"><b>Cedula</b></font></td>
-					<td><font face="verdana"><b>Solicitud</b></font></td>
-					<td><font face="verdana"><b>Razon</b></font></td>			
-					<td><font face="verdana"><b>      </b></font></td>	
-					</tr>
-					<?php
-
-				
-
-				while(!$result->EOF) 
-				{	
-					for ($i=0, $max=$result->FieldCount(); $i<$max; $i++)
-					{
-							
-							$numero_sol=$result->fields[1];
-							$cedula=$result->fields[0];
-							$razon=$result->fields[2];
-							$exp=$result->fields[5];	
-							$cedula2=base64_encode ($cedula);
-							$numero_sol2=base64_encode ($numero_sol);	
-							
-																				
-									echo "<tr><td width=\"200\"><font face=\"verdana\">" .$cedula  . "</font></td>";					
-									echo "<td width=\"200\"><font face=\"verdana\">" .$numero_sol. "</font></td>";
-									echo "<td width=\"200\"><font face=\"verdana\">" .$razon . "</font></td>";								
-									echo "<td width=\"200\"><font face=\"verdana\"><a href=\"evaluar.php?id=".$cedula2."&numero=".$numero_sol2."\" target='_blank'>Evaluar</a></p>"; "</font></td></tr>";							  
-								
-								$result->MoveNext();											
-								break;							
-							
-					}
-				}
-			  
-				?>
-				</table>
-				<?php
-				// The "back" link
-			   $prevlink = ($page > 1) ? '<a data-url="../llamadas/retiros.php?page=1" id="linkf" title="First page">&laquo;</a> <a data-url="../llamadas/retiros.php?page=' . ($page - 1) . '" id="link_'.($page-1).'" title="Previous page">&lsaquo;</a>' : '<span class="disabled">&laquo;</span> <span class="disabled">&lsaquo;</span>';
-
-			    // The "forward" link
-			    $nextlink = ($page < $pages) ? '<a data-url="../llamadas/retiros.php?page=' . ($page + 1) . '" id="link_'.($page+1).'" title="Next page">&rsaquo;</a> <a data-url="../llamadas/retiros.php?page=' . $pages . '" id="linkl" title="Last page">&raquo;</a>' : '<span class="disabled">&rsaquo;</span> <span class="disabled">&raquo;</span>';
-
-			    // Display the paging information
-			    echo '<div id="paging"><p>', $prevlink, ' Page ', $page, ' of ', $pages, ' pages, displaying ', $start, '-', $end, ' of ', $total, ' results ', $nextlink, '  </p></div>';
-			}	
-	}
-	else
-	{
-			$query2="SELECT * FROM solicitud_cde";	
-			$result=$conn->Execute($query2);
-			if($result==false)
-			{
-				echo "error al recuperar: ".$conn->ErrorMsg()."<br>" ;
-			}
-			else
-			{	
-			 
-				?>
-					<table border="0" class="bordered" cellspacing=25 cellpadding=2 style="font-size: 10pt">
-					<tr>
-					<td><font face="verdana"><b>Cedula</b></font></td>
-                    <td><font face="verdana"><b>Solicitud</b></font></td>
-                    <td><font face="verdana"><b>Razon</b></font></td>		
-					<td><font face="verdana"><b>Carrera Actual</b></font></td>	
-                    <td><font face="verdana"><b>Carrera Siguiente</b></font></td>
-                    <td><font face="verdana"><b>                 </b></font></td>
-					</tr>
-					<?php
-					
-							
-				while(!$result->EOF) 
-				{			
-					for ($i=0, $max=$result->FieldCount(); $i<$max; $i++)
-					{
-							
-							$numero_sol=$result->fields[1];
-							$cedula=$result->fields[0];
-							$razon=$result->fields[2];	
-							$carrera_actual=$result->fields[3];
-							$carrera_siguiente=$result->fields[4];
-							$cedula2=base64_encode ($cedula);
-							$numero_sol2=base64_encode ($numero_sol);
-							//$carrera_actual=base64_encode ($carrera_actual);
-							//$carrera_siguiente=base64_encode ($carrera_siguiente);	
-						$query3="SELECT * FROM esp WHERE codigo LIKE '%$carrera_actual%'";
-						$result=$conn2->Execute($query3);
-						if($result==false)
-						{
-							echo "error al recuperar: ".$conn2->ErrorMsg()."<br>" ;
-						}
-						else
-						{	
-							while(!$result->EOF) 
-							{			
-								for ($i=0, $max=$result->FieldCount(); $i<$max; $i++)
-								{	
-									$carrera_actual=$result->fields[1];
-								}
-								break;
-							}
-						}	
-						$query4="SELECT * FROM esp WHERE codigo LIKE '%$carrera_siguiente%'";
-						$result=$conn2->Execute($query4);
-						if($result==false)
-						{
-							echo "error al recuperar: ".$conn2->ErrorMsg()."<br>" ;
-						}
-						else
-						{	
-							while(!$result->EOF) 
-							{			
-								for ($i=0, $max=$result->FieldCount(); $i<$max; $i++)
-								{	
-									$carrera_siguiente=$result->fields[1];
-								}
-								break;
-							}
-						}						
-																							
-								echo "<tr><td width=\"200\"><font face=\"verdana\">" .$cedula  . "</font></td>";					
-								echo "<td width=\"200\"><font face=\"verdana\">" .$numero_sol. "</font></td>";
-								echo "<td width=\"200\"><font face=\"verdana\">" .$razon. "</font></td>";
-								echo "<td width=\"200\"><font face=\"verdana\">" .$carrera_actual . "</font></td>";
-								echo "<td width=\"200\"><font face=\"verdana\">" .$carrera_siguiente . "</font></td>";
-								echo "<td width=\"200\"><font face=\"verdana\"><a href=\"evaluar.php?id=".$cedula2."&numero=".$numero_sol2."\" target='_blank'>Evaluar</a></p>"; "</font></td></tr>";							  
-								$result->MoveNext();											
-								break;							
-							
-					}
-				}
-			  
-				?>
-				</table>
-				<?php
-			}
-	}
-	$conn->Close();
-	$conn2->Close();
-}
-
 
 /*============================================================================================================================
 					FUNCION PARA EL CALCULO DE LOS PARAMETROS DE LOS TOMADORES DE DECISIONES

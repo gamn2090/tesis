@@ -1,27 +1,85 @@
 <?php
 include('../config.php');
 include('../procesos/funciones.php');
-
-$proceso="Cambio de Especialidad";
+$proceso="Retiro";
 session_start();
 $nivel=$_SESSION['nivel'];
 $bandera=$_SESSION['bandera'];  
-if($_GET['page']!= NULL)
-{	
-	$page=$_GET['page'];
-	$offset=($page-1)*3;
-}
-else
-{
-	$offset=0;
-}
-if($nivel==$bandera)
-{
-	mostrar_proceso_coord($proceso,$conn,$conn2,$offset);
-}
-else
-{
-	mostrar_proceso_sec($proceso,$conn,$conn2,$offset);
-}
+/*if($nivel==$bandera)
+	{
+		mostrar_proceso_coord($proceso,$conn,$conn2);
+	}
+	else
+	{
+		mostrar_proceso_sec($proceso,$conn,$conn2);
+	/*}*/
 ?>
-			
+	<!DOCTYPE html>
+<html>
+<head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8">  	
+    <!-- <link rel="stylesheet" type="text/css" href="../css/jquery.dataTables.css">
+    <link rel="stylesheet" type="text/css" href="../css/dataTables.editor.css">   -->
+</head>
+<body>
+
+    <table id="mytable" class="display" style="text-align:center" cellspacing="0" width="100%">
+        <thead>
+            <tr>
+                <th>cedula</th>
+                <th>numero</th>
+                <th>carrera actual</th>  
+                <th>carrera siguiente</th>  
+                <th>accion</th>               
+            </tr>
+        </thead>        
+        <tfoot>
+            <tr>
+                <th>cedula</th>
+                <th>numero</th>
+                <th>carrera actual</th>  
+                <th>carrera siguiente</th>  
+                <th>accion</th>               
+            </tr>
+        </tfoot>
+    </table>
+    <script>
+   $(document).ready(function(){
+        var datatable = $('#mytable').DataTable({
+                       "ajax": {
+                            "url": "../procesos/motor_funciones.php",
+                            "type": "POST",
+                            "data" : {
+                                    "accion" : "mostrar_proceso_cde",   //nombre que recibe el switch    
+                                    }
+                       },
+                        "sAjaxDataProp": "",
+                        "processing": true,
+                       // "serverSide": true,
+                         columns: 
+                         [
+                            {data:"cedula"},
+                            {data:"numero"},
+                            {data:"carrera_a"},
+                            {data:"carrera_s"},
+                            {data:"link"}                       
+                          ]    
+                             
+                    }); 
+    });
+    </script>
+<!--<script src="https://code.jquery.com/jquery-2.1.4.min.js"></script>
+<script src="../js/materialize.js"></script>
+<script type="text/javascript" language="javascript" src="../js/jquery.dataTables.js"></script>
+<script type="text/javascript" language="javascript" src="../js/dataTables.tableTools.js"></script>
+<script type="text/javascript" language="javascript" src="../js/dataTables.editor.js"></script>
+<script src="../js/init.js"></script>-->
+</body>
+</html>
+
+
+
+
+	
+					
+				
