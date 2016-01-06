@@ -46,7 +46,7 @@ $(document).ready(function(){
 				$("#crearcuenta").on('click', function() {
 					var url = $(this).attr('data-url');
 					carga2(url);
-					$("#imagen2").attr("src","../img/nueva_cuenta.png");
+					$("#imagen2").attr("src","../img/mant.jpg");
 					$('#nombre2').html('CREAR NUEVA CUENTA');
 				})
 
