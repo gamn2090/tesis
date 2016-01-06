@@ -84,12 +84,8 @@ if($usuario!= NULL)
           <li id="reingresos" data-url="reingreso.php" class="tab col s3"><a href="#">Reingresos</a></li>
           <li id="CDE" data-url="cambio_especialid.php" class="tab col s3"><a href="#">Cambio de Especialidades</a></li>
         </ul>        
-      </div> 
-      
-        <div id="principal" class="col s12">    
-
-            
-
+      </div>       
+        <div id="principal" class="col s12"> 
         </div>
     </div> 
     </div> 
@@ -155,7 +151,6 @@ if($usuario!= NULL)
       </div>
     </div>
   </footer>
-
 
   <!--  Scripts-->
   <script src="https://code.jquery.com/jquery-2.1.4.min.js"></script>

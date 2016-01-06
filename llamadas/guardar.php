@@ -58,30 +58,7 @@ session_start();
   <br><br>
 	<div class="container">
 		<div id="evaluar" class="content">
-			 <?php
-          if(isset($_GET['mensaje']) && $_GET['mensaje']==1)
-          { 
-          ?>    
-                <script>
-                    function myFunction() {
-                        alert("Resultado guardado en el histórico exitosamente");
-                    }
-                </script>
-          <?php
-          }
-          else
-          { 
-            if(isset($_GET['mensaje']) && $_GET['mensaje']==0)
-            {
-            ?>          
-                  <script>
-                      function myFunction() {
-                          alert("Resultado no guardado en el histórico");
-                      }
-                  </script>      
-            <?php
-            }
-          }
+			 <?php          
           	if(isset($_POST['Nombre']))
 						{
 							$nombre=$_POST['Nombre'];
@@ -99,9 +76,32 @@ session_start();
 							$anio=$_POST['anio'];		
               $numero_soli=$_POST['numero_soli'];	
 						}
-						$resultado=validar_solicitud($numero_soli,$anio,$fecha,$cedula,$razon,$solicitud_actual,$aval,$conn,$conn2);
-						
-						
+						$resultado=validar_solicitud($numero_soli,$anio,$fecha,$cedula,$razon,$solicitud_actual,$aval,$conn,$conn2);						
+					if($resultado==1)
+          { 
+          ?>    
+                <script>
+                    function myFunction() {
+                        alert("Resultado guardado exitosamente");
+                        window.close();
+                    }
+                </script>
+          <?php
+          }
+          else
+          { 
+            if($resultado==0)
+            {
+            ?>          
+                  <script>
+                      function myFunction() {
+                          alert("Resultado no guardado");
+                          window.close();
+                      }
+                  </script>      
+            <?php
+            }
+          }	
 				
 			?>
 		

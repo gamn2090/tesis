@@ -22,13 +22,19 @@ include('../procesos/funciones.php');
                     </div>
                     <div class="row">
                         <div class="input-field col s6">
-                            <input id="puntaje" name="puntaje" type="text" class="validate">
-                            <label for="puntaje">Puntaje</label>
-                        </div>
-                        <div class="input-field col s6 ">
+                            <select class="browser-default" id="puntaje" name="puntaje">
+                              <option value="" disabled selected>Elija el Puntaje</option>
+                              <option value="1">1</option>
+                              <option value="2">2</option>
+                              <option value="3">3</option>
+                              <option value="4">4</option>
+                              <option value="5">5</option>                              
+                            </select>
+                         </div>                        
+                       <!-- <div class="input-field col s6 ">
                             <input id="ponderacion" name="ponderacion" type="text" class="validate">
                             <label for="ponderacion">Ponderación</label>
-                        </div>
+                        </div>-->
                     </div>   
                     <div class="divider"></div>
                     <div class="row">                       

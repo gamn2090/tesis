@@ -61,8 +61,6 @@ $bandera=$_SESSION['bandera'];
                        },
                         "sAjaxDataProp": "",
                         "processing": true,
-                        "iDisplayLength" : 10,
-                       "serverSide": true,
                          columns: 
                          [
                             {data:"cedula"},

@@ -281,12 +281,12 @@ function mostrar_proceso($proceso,$bandera,$nivel,$conn,$conn2)
 	{		
 		if($nivel==$bandera)
 		{
-			$query="SELECT * FROM solicitudes WHERE (proceso LIKE '%$proceso%' AND exp NOT LIKE '-1')";
+			$query="SELECT * FROM solicitudes WHERE (proceso LIKE '$proceso%' AND exp NOT LIKE '-1' AND exp NOT LIKE '0')";
 			$result=$conn->Execute($query);	
 		}
 		else
 		{
-			$query="SELECT * FROM solicitudes WHERE (proceso LIKE '%$proceso%' AND exp LIKE '-1')";
+			$query="SELECT * FROM solicitudes WHERE (proceso LIKE '$proceso%' AND exp LIKE '-1')";
 			$result=$conn->Execute($query);	
 		}		
 			if($result==false)
@@ -321,8 +321,16 @@ function mostrar_proceso($proceso,$bandera,$nivel,$conn,$conn2)
 	}
 	else
 	{
-			$query2="SELECT * FROM solicitud_cde";	
-			$result=$conn->Execute($query2);
+			if($nivel==$bandera)
+			{
+				$query="SELECT * FROM solicitudes_cde WHERE (exp NOT LIKE '-1' AND exp NOT LIKE '0')";
+				$result=$conn->Execute($query);	
+			}
+			else
+			{
+				$query="SELECT * FROM solicitudes_cde WHERE (exp LIKE '-1')";
+				$result=$conn->Execute($query);	
+			}		
 			if($result==false)
 			{
 				echo "error al recuperar: ".$conn->ErrorMsg()."<br>" ;
@@ -724,8 +732,35 @@ function mostrar_datos_estudiante_coord($aval,$cedula,$nombre,$apellido,$razon,$
 
 function validar_solicitud($numero_soli,$anio,$fecha,$cedula,$razon,$solicitud_actual,$aval,$conn,$conn2)
 {	
-	$query="SELECT * FROM solicitudes";	
-	$result=$conn->Execute($query);
+	if($solicitud_actual=='Retiro')
+	{
+		$query="SELECT * FROM solicitudes WHERE exp LIKE 'RT-%'";	
+		$result=$conn->Execute($query);
+	}
+	else
+	{
+		if($solicitud_actual=='Reingreso')
+		{
+			$query="SELECT * FROM solicitudes WHERE exp LIKE 'RCC-%'";	
+			$result=$conn->Execute($query);
+		}
+		else
+		{
+			if($solicitud_actual=='Reingreso_tg')
+			{
+				$query="SELECT * FROM solicitudes WHERE exp LIKE 'RTG-%'";	
+				$result=$conn->Execute($query);
+			}
+			else
+			{
+				if($solicitud_actual=='Cambio')
+				{
+					$query="SELECT * FROM solicitudes WHERE exp LIKE 'CE-%'";	
+					$result=$conn->Execute($query);
+				}
+			}
+		}
+	}	
 	if($result==false)
 	{
 		echo "error al recuperar: ".$conn->ErrorMsg()."<br>" ;
@@ -735,7 +770,6 @@ function validar_solicitud($numero_soli,$anio,$fecha,$cedula,$razon,$solicitud_a
 		$cont=1;			
 		while(!$result->EOF) 
 		{	
-
 			for ($i=0, $max=$result->FieldCount(); $i<$max; $i++)
 			{
 				$exp=$result->fields[5];				
@@ -747,74 +781,189 @@ function validar_solicitud($numero_soli,$anio,$fecha,$cedula,$razon,$solicitud_a
 			$result->MoveNext();
 		}
 	}	
+
+	if($solicitud_actual=='Retiro')
+	{
+		$query="SELECT * FROM decisiones WHERE exp LIKE 'RT-%'";	
+		$result=$conn->Execute($query);
+	}
+	else
+	{
+		if($solicitud_actual=='Reingreso')
+		{
+			$query="SELECT * FROM decisiones WHERE exp LIKE 'RCC-%'";	
+			$result=$conn->Execute($query);
+		}
+		else
+		{
+			if($solicitud_actual=='Reingreso_tg')
+			{
+				$query="SELECT * FROM decisiones WHERE exp LIKE 'RTG-%'";	
+				$result=$conn->Execute($query);
+			}
+			else
+			{
+				if($solicitud_actual=='Cambio')
+				{
+					$query="SELECT * FROM decisiones WHERE exp LIKE 'CE-%'";	
+					$result=$conn->Execute($query);
+				}
+			}
+		}
+	}	
+	if($result==false)
+	{
+		echo "error al recuperar: ".$conn->ErrorMsg()."<br>" ;
+	}
+	else
+	{					
+		while(!$result->EOF) 
+		{	
+			for ($i=0, $max=$result->FieldCount(); $i<$max; $i++)
+			{
+				$exp=$result->fields[13];				
+			}	
+			if($exp != '-1')
+			{
+				$cont++;
+			}
+			$result->MoveNext();
+		}
+	}	
+
 	$anio=substr($anio, -2);
+
 	switch ($solicitud_actual)
 	{
-
 		case 'Retiro':
 				if($aval=="Si")
 				{
 					$periodo=saber_periodo($anio,$fecha,$conn2);
-					$aval="RET-".$cont.".".$anio.".".$periodo;
+					$aval="RT-".$cont.".".$anio.".".$periodo;
 					$query2="UPDATE solicitudes SET exp='$aval' WHERE numero_soli= $numero_soli";
 					$result=$conn->Execute($query2);
 					if($result==false)
 					{
-						$bandera=0;}
-					else
-					{	
-						echo $cont;
+						$bandera=0;
 					}
-					/*$query="UPDATE razon_proceso SET proceso='$proceso', razon='$razon', puntaje='$puntaje', fecha='$fecha' WHERE ((proceso LIKE '%$proceso%') AND (razon LIKE '%$razon%'))";
-					$result=$conn->Execute($query);
-					if($result==false)
-					{
-						$bandera=0;}
 					else
 					{	
 						$bandera=1;
-					}*/
-
+					}
 				}
 				else
 				{
-					$aval=="0";
-					/*llamar a la función para actualizar taba solicitudes de mi tesis*/
-
+					$aval="0";
+					$query2="UPDATE solicitudes SET exp='$aval' WHERE numero_soli= $numero_soli";
+					$result=$conn->Execute($query2);
+					if($result==false)
+					{
+						$bandera=0;
+					}
+					else
+					{	
+						$bandera=1;
+					}
 				}
-			break;
-		
+		break;		
 		case 'Cambio':
 				if($aval=="Si")
 				{
 					$periodo=saber_periodo($anio,$fecha,$conn2);
-					//$aval="CE-".+.$cont.+.".".+.$anio.+.".".+.$periodo;
-					/*llamar a la función para actualizar taba solicitudes de mi tesis*/
-
+					$aval="CE-".$cont.".".$anio.".".$periodo;
+					$query2="UPDATE solicitudes_cde SET exp='$aval' WHERE numero_soli= $numero_soli";
+					$result=$conn->Execute($query2);
+					if($result==false)
+					{
+						$bandera=0;
+					}
+					else
+					{	
+						$bandera=1;
+					}	
 				}
 				else
 				{
-					$aval=="0";		
-					/*llamar a la función para actualizar taba solicitudes de mi tesis*/
-
+					$aval="0";		
+					$query2="UPDATE solicitudes_cde SET exp='$aval' WHERE numero_soli= $numero_soli";
+					$result=$conn->Execute($query2);
+					if($result==false)
+					{
+						$bandera=0;
+					}
+					else
+					{	
+						$bandera=1;
+					}	
 				}
-			break;
+		break;
 
 		case 'Reingreso':
 				if($aval=="Si")
 				{
 					$periodo=saber_periodo($anio,$fecha,$conn2);
-					//$aval="RCC-".+.$cont.+.".".+.$anio.+.".".+.$periodo;
-					/*llamar a la función para actualizar taba solicitudes de mi tesis*/
+					$aval="RCC-".$cont.".".$anio.".".$periodo;
+					$query2="UPDATE solicitudes SET exp='$aval' WHERE numero_soli= $numero_soli";
+					$result=$conn->Execute($query2);
+					if($result==false)
+					{
+						$bandera=0;
+					}
+					else
+					{	
+						$bandera=1;
+					}	
 				}
 				else
 				{
-					$aval=="0";
-					/*llamar a la función para actualizar taba solicitudes de mi tesis*/
+					$aval="0";
+					$query2="UPDATE solicitudes SET exp='$aval' WHERE numero_soli= $numero_soli";
+					$result=$conn->Execute($query2);
+					if($result==false)
+					{
+						$bandera=0;
+					}
+					else
+					{	
+						$bandera=1;
+					}	
 
 				}
-			break;		
+			break;	
+			case 'Reingreso_tg':
+				if($aval=="Si")
+				{
+					$periodo=saber_periodo($anio,$fecha,$conn2);
+					$aval="RTG-".$cont.".".$anio.".".$periodo;
+					$query2="UPDATE solicitudes SET exp='$aval' WHERE numero_soli= $numero_soli";
+					$result=$conn->Execute($query2);
+					if($result==false)
+					{
+						$bandera=0;
+					}
+					else
+					{	
+						$bandera=1;
+					}	
+				}
+				else
+				{
+					$aval="0";
+					$query2="UPDATE solicitudes SET exp='$aval' WHERE numero_soli= $numero_soli";
+					$result=$conn->Execute($query2);
+					if($result==false)
+					{
+						$bandera=0;
+					}
+					else
+					{	
+						$bandera=1;
+					}	
+
+				}
+			break;			
 	}
+	return $bandera;
 
 }
 /*===========================================================================================================================
@@ -1678,10 +1827,16 @@ function cambiar_valor_TDD($proceso,$razon,$puntaje,$conn)
                             <input id="usuario" disabled type="text" class="validate" value="<?php echo $razon ?>">
                             <label for="usuario">Razón</label>
                         </div>
-                        <div class="input-field col s12 m6 offset-m3">
-                            <input id="puntaje" name="puntaje" type="text" class="validate" value="<?php echo $puntaje; ?>">
-                            <label for="puntaje">Ingrese el Puntaje</label>
-                        </div>
+                         <div class="input-field col s12 m6 offset-m3">
+                            <select class="browser-default" id="puntaje" name="puntaje">
+                              <option value="" disabled selected>Elija el Puntaje</option>
+                              <option value="1">1</option>
+                              <option value="2">2</option>
+                              <option value="3">3</option>
+                              <option value="4">4</option>
+                              <option value="5">5</option>                              
+                            </select>
+                         </div>       
                     </div>                
                     <div class="divider"></div>
                     <div class="row">                       
