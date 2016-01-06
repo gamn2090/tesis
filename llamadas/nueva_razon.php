@@ -4,7 +4,7 @@ include('../procesos/funciones.php');
 ?>				
 <body>
 
-        <form id="login" class="col s12" id="ingresar razon" action="ingresar_razon.php" method="POST">
+        <form id="login" class="col s12" id="ingresar razon" action="../procesos/motor_funciones.php" method="POST">
                     <div class="row">
                         <div class="input-field col s6">             
                           <select class="browser-default" id="proceso" name="proceso">
@@ -34,7 +34,7 @@ include('../procesos/funciones.php');
                     <div class="row">                       
                         <div class="col m12 offset">
                             <p class="center-align">
-                                <button class="btn btn-large waves-effect waves-light" id="razon" type="submit" value="Ingresa Razón" name="accion" title="login">Ingresar</button>
+                                <button class="btn btn-large waves-effect waves-light" id="razon" type="submit" value="ingresar_razon" name="accion" title="login">Ingresar</button>
                             </p>
                         </div>
                     </div> 

@@ -73,7 +73,70 @@
  				$array=visualizar_historico($nivel,$conn);
  				echo $array;			
  		break;
-			}
+ 		case 'ingresar_historico':
+ 					$exp=$_POST['exp'];
+					$cedula=$_POST['cedula'];					
+					$razon=$_POST['razon'];					
+					$promedio=$_POST['promedio'];					
+					$solicitudes=$_POST['soli_ant'];
+					$solicitud_actual=$_POST['solicitud'];
+					$aval=$_POST['aval'];					
+					$fecha=$_POST['fecha'];	
+					$medidas=$_POST['medidas'];	
+					$decision=$_POST['decision'];
+					$decision2=$_POST['decision2'];
+					$fecha_solicitud=$_POST['fecha_solicitud'];	
+					$acuerdo=$_POST['acuerdo'];
+					$observaciones=$_POST['observaciones'];			
+				
+						if($decision=="Indefinida")
+						{
+						$mensaje1=ingresar_historico($exp,$cedula,$fecha_solicitud,$razon,$promedio,$solicitudes,$solicitud_actual,$aval,$fecha,$medidas,$decision2,$observaciones,$acuerdo,$conn);
+						}
+						else
+						{					
+							$mensaje1=ingresar_historico($exp,$cedula,$fecha_solicitud,$razon,$promedio,$solicitudes,$solicitud_actual,$aval,$fecha,$medidas,$decision,$observaciones,$acuerdo,$conn);
+						}
+						$mensaje=$exp;
+						header("location: ../llamadas/resultado.php?mensaje=$mensaje");
+ 		break;
+ 		case 'actualizar_puntaje':
+ 				$proceso=$_POST['proceso'];
+				$puntaje=$_POST['puntaje'];
+				$fecha=$_POST['fecha'];
+				$razon=$_POST['razon'];
+				$bandera=actualizar_puntaje($proceso, $razon, $puntaje,$fecha,$conn);
+				header("location: ../llamadas/cambio_valores.php?bandera=$bandera");	
+ 		break;
+ 		case 'crear_cuenta':
+ 			$cedula=$_POST['cedula'];
+			$nombre=$_POST['Nombre'];
+			$apellido=$_POST['Apellido'];
+			$sexo=$_POST['sexo'];
+			$usuario=$_POST['usuario'];
+			$contraseña=$_POST['contraseña'];
+			$privilegios=$_POST['privilegios'];
+			$funcion=crear_cuenta($cedula,$nombre,$apellido,$sexo,$usuario,$contraseña,$privilegios,$conn);
+			if($funcion==1)
+				{
+					header("location: ../coordinacion_principal.php?mensaje=$funcion");
+				}
+				else
+				{
+					header("location: ../coordinacion_principal.php?&mensaje=$funcion");
+				}							
+		break;
+		case 'ingresar_razon':
+				$proceso=$_POST['proceso'];
+				$puntaje=$_POST['puntaje'];
+				$ponderacion=$_POST['ponderacion'];
+				$razon=$_POST['razon'];
+				$fecha=fecha_hoy();
+				$funcion=ingresar_razon($proceso,$razon,$puntaje,$ponderacion,$fecha,$conn);				
+						header("location: ../coordinacion_principal.php?mensaje=$funcion");					
+		break;
+
+		}//fin switch	
 	}//fin isset[$_post[accion]]
 
 ?>

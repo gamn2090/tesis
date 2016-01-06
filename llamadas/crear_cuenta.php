@@ -4,7 +4,7 @@ include('../procesos/funciones.php');
 ?>				
 <body>
 
-        <form class="col s12" id="crear cuenta" action="notificacion_cuenta.php" method="POST">
+        <form class="col s12" id="crear cuenta" action="../procesos/motor_funciones.php" method="POST">
                     <div class="row">
                         <div class="input-field col s6">
                             <input id="Nombre" name="Nombre" type="text" class="validate">
@@ -52,7 +52,7 @@ include('../procesos/funciones.php');
                     <div class="row">                       
                         <div class="col m12 offset">
                             <p class="center-align">
-                                <button class="btn btn-large waves-effect waves-light" id="crear" type="submit" value="Crear" name="accion" title="login">Crear</button>
+                                <button class="btn btn-large waves-effect waves-light" id="crear" type="submit" value="crear_cuenta" name="accion" title="login">Crear</button>
                             </p>
                         </div>
                     </div>

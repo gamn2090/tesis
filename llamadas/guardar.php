@@ -20,7 +20,7 @@ session_start();
 	include ("../config.php");
 ?>
 </head>
-<body>
+<body onload="myFunction()">
 <nav class="white" role="navigation">
     <div class="nav-wrapper container">
       <a id="logo-container" href="../coordinacion_principal.php" class="brand-logo"><img src="../img/udo.gif" alt=""></a>
@@ -58,20 +58,31 @@ session_start();
   <br><br>
 	<div class="container">
 		<div id="evaluar" class="content">
-			<?php
-				if(isset($_GET['mensaje']) && $_GET['mensaje']==0)
-				{
-					echo "Resultado guardado en el historico exitosamente";
-				}
-				else
-				{
-					if(isset($_GET['mensaje']) && $_GET['mensaje']==1)
-					{
-						echo "Resultado no guardado en el historico";
-					}
-					else
-					{			
-						if(isset($_POST['Nombre']))
+			 <?php
+          if(isset($_GET['mensaje']) && $_GET['mensaje']==1)
+          { 
+          ?>    
+                <script>
+                    function myFunction() {
+                        alert("Resultado guardado en el histórico exitosamente");
+                    }
+                </script>
+          <?php
+          }
+          else
+          { 
+            if(isset($_GET['mensaje']) && $_GET['mensaje']==0)
+            {
+            ?>          
+                  <script>
+                      function myFunction() {
+                          alert("Resultado no guardado en el histórico");
+                      }
+                  </script>      
+            <?php
+            }
+          }
+          	if(isset($_POST['Nombre']))
 						{
 							$nombre=$_POST['Nombre'];
 							$apellido=$_POST['Apellido'];
@@ -90,8 +101,8 @@ session_start();
 						}
 						$resultado=validar_solicitud($numero_soli,$anio,$fecha,$cedula,$razon,$solicitud_actual,$aval,$conn,$conn2);
 						
-						}
-				}
+						
+				
 			?>
 		
 		</div>

@@ -1334,7 +1334,7 @@ function mostrar_decision($exp,$fecha_solicitud,$cedula,$pros_aca,$razon,$solici
 	}
 	
 ?>		
-	<form class="col s12" id="decision" action="ingresar.php" method="POST">
+	<form class="col s12" id="decision" action="../procesos/motor_funciones.php" method="POST">
            	        <input type="hidden" id="fecha_solicitud" name="fecha_solicitud" value="<?php echo $fecha_solicitud; ?>">
         			<input type="hidden" id="nombre" name="nombre"  value="<?php echo $nombre; ?>">
 					<input type="hidden" id="exp" name="exp"  value="<?php echo $exp; ?>">
@@ -1436,7 +1436,7 @@ function mostrar_decision($exp,$fecha_solicitud,$cedula,$pros_aca,$razon,$solici
                     <div class="row">                       
                         <div class="col m12 offset">
                             <p class="center-align">
-                                <button class="btn btn-large waves-effect waves-light" id="crear" type="submit" value="Evaluar" name="accion" title="login">DECISION</button>
+                                <button class="btn btn-large waves-effect waves-light" id="crear" type="submit" value="ingresar_historico" name="accion" title="login">DECISION</button>
                             </p>
                         </div>
                     </div>
@@ -1486,11 +1486,11 @@ function ingresar_razon($proceso,$razon,$puntaje,$porcentaje,$fecha,$conn)
 	$result=$conn->Execute($query);
 	if($result==false)
 	{
-		$bandera="3";
+		$bandera="2";
 	}	
 	else
 	{
-		$bandera="2";	
+		$bandera="3";	
 	}
 	return($bandera);
 	$conn->Close();
@@ -1665,7 +1665,7 @@ function cambiar_valor_TDD($proceso,$razon,$puntaje,$conn)
 	$fecha=fecha_hoy();
 ?>	
 
-<form class="col s12" id="cambiar_valor_TDD" action="actualizar_valores.php" method="POST">
+<form class="col s12" id="cambiar_valor_TDD" action="../procesos/motor_funciones.php" method="POST">
            	        <input type="hidden" id="fecha" name="fecha" value="<?php echo $fecha ?>">
 	       			<input type="hidden" id="proceso" name="proceso" value="<?php echo $proceso ?>">
 	       			<input type="hidden" id="razon" name="razon" value="<?php echo $razon ?>">
@@ -1687,7 +1687,7 @@ function cambiar_valor_TDD($proceso,$razon,$puntaje,$conn)
                     <div class="row">                       
                         <div class="col m12 offset">
                             <p class="center-align">
-                                <button class="btn btn-large waves-effect waves-light" id="crear" type="submit" value="Actualizar" name="accion" title="login">Actualizar</button>
+                                <button class="btn btn-large waves-effect waves-light" id="crear" type="submit" value="actualizar_puntaje" name="accion" title="login">Actualizar</button>
                             </p>
                         </div>
                     </div>
@@ -1860,7 +1860,7 @@ function estudiar_decision($fecha,$cedula,$solicitud,$conn,$conn2)
                     </div>
                     <div class="row">
                         <div class="input-field col s12 m6">
-                            <input type="text" class="validate" disabled value="<?php echo $razon_aval ?>">
+                            <input type="text" class="validate" disabled value="<?php echo $aval ?>">
                             <label>Y </label>
                         </div>
                         <div class="input-field col s12 m6">
@@ -1877,9 +1877,18 @@ function estudiar_decision($fecha,$cedula,$solicitud,$conn,$conn2)
 				          <textarea id="observaciones" disabled name="observaciones" class="materialize-textarea"><?php echo $observaciones ?></textarea>
 				          <label for="observaciones">Observaciones</label>
 				        </div>
-				      </div>                                      
+				    </div>  
+				    <div class="col m12 offset">
+                            <p class="center-align">
+                                <button class="btn btn-large waves-effect waves-light" id="cerrar" onClick="myFunction()" >Aceptar</button>
+                            </p>
+                    </div>                                    
         </form> 
-	
+		<script>
+            function myFunction() {
+                window.close();
+            }
+        </script>
 <?php
 $conn->Close();
 }

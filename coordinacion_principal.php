@@ -25,7 +25,59 @@ if($usuario!= NULL)
   include ("config.php");
   ?>
 </head>
-<body>
+<body onload="myFunction()">
+
+  <?php
+  if(isset($_GET['mensaje']) && $_GET['mensaje']==1)
+  { 
+  ?>    
+        <script>
+            function myFunction() {
+                alert("Cuenta creada exitosamente");
+            }
+        </script>
+  <?php
+  }
+  else
+  { 
+    if(isset($_GET['mensaje']) && $_GET['mensaje']==0)
+    {
+    ?>          
+          <script>
+              function myFunction() {
+                  alert("Cuenta no creada");
+              }
+          </script>      
+    <?php
+    }
+    else
+    { 
+      if(isset($_GET['mensaje']) && $_GET['mensaje']==2)
+      {
+      ?>          
+            <script>
+                function myFunction() {
+                    alert("Razon no ingresada");
+                }
+            </script>      
+      <?php
+      }
+      else
+      {
+        if(isset($_GET['mensaje']) && $_GET['mensaje']==3)
+        {
+        ?>          
+              <script>
+                  function myFunction() {
+                      alert("Razón ingresada correctamente");
+                  }
+              </script>      
+        <?php
+        }
+      }
+    }
+  }
+  ?>
   <nav class="white" role="navigation">
     <div class="nav-wrapper container">
       <a id="logo-container" href="coordinacion_principal.php" class="brand-logo"><img src="img/udo.gif" alt=""></a>

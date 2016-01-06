@@ -20,7 +20,7 @@ session_start();
 	include ("../config.php");
 ?>
 </head>
-<body>
+<body onload="myFunction()">
 <nav class="white" role="navigation">
     <div class="nav-wrapper container">
       <a id="logo-container" href="../coordinacion_principal.php" class="brand-logo"><img src="../img/udo.gif" alt=""></a>
@@ -59,26 +59,29 @@ session_start();
 	<div class="container">
 		<div id="evaluar" class="content">
 <?php
-	if(isset($_GET['bandera']) && $_GET['bandera']==0)
+	if(isset($_GET['bandera']) && $_GET['bandera']==1)
 	{	
-	?>
-        <div >		
-                Cambios NO realizados <br/>
-                <br/>			
-        </div>
-    <?php
-		
+	?>    
+        <script>
+            function myFunction() {
+                alert("Cambios realizados exitosamente");
+                window.close();
+            }
+        </script>
+  <?php
 	}
 	else
 	{	
-		if(isset($_GET['bandera']) && $_GET['bandera']==1)
+		if(isset($_GET['bandera']) && $_GET['bandera']==0)
 		{
-		?>
-            <div >		
-                    Cambios realizados <br/>
-                    <br/>			
-            </div>
-         <?php
+		?>          
+        <script>
+            function myFunction() {
+                alert("Cambios no realizados");
+                window.close();
+            }
+        </script>      
+    <?php
 		}
 		else
 		{	
