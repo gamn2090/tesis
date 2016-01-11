@@ -59,38 +59,40 @@ session_start();
 	<div class="container">
 		<div id="evaluar" class="content">
 			<?php
-            $razon=$_POST['razon'];   //=     
-            $promedio=$_POST['promedio']; //=       
-            $solicitudes=$_POST['soli_ant']; //=
-            $solicitud_actual=$_POST['solicitud']; //=
-            $aval=$_POST['aval']; //=       
-            $tiempo_sol=$_POST['fecha'];  //=
-            $medidas=$_POST['medidas']; //=
-            $observaciones=$_POST['observaciones'];
-          ?>
-          <table id="mytable" class="display" style="text-align:center" cellspacing="0" width="100%">
-            <thead>
-                <tr>
-                    <th>cedula</th>
-                    <th>solicitud actual</th>
-                    <th>fecha de solicitud</th>
-                    <th>razon</th>  
-                    <th>resultado</th>   
-                    <th>Accion</th>            
-                </tr>
-            </thead>        
-            <tfoot>
-                <tr>
-                    <th>cedula</th>
-                    <th>solicitud actual</th>
-                    <th>fecha de solicitud</th>
-                    <th>razon</th>  
-                    <th>resultado</th>   
-                    <th>Accion</th>              
-                </tr>
-            </tfoot>
-        </table> 
-		
+        if(isset($_GET['mensaje']) && $_GET['mensaje']==0)
+        {
+          echo "Resultado guardado en el historico exitosamente";
+        }
+        else
+        {
+          if(isset($_GET['mensaje']) && $_GET['mensaje']==1)
+          {
+            echo "Resultado no guardado en el historico";
+          }
+          else
+          {     
+            if(isset($_POST['Nombre']))
+            { 
+              $nombre=$_POST['Nombre'];
+              $apellido=$_POST['Apellido'];
+              $cedula=$_POST['cedula'];
+              $discapacidad=$_POST['discapacidad'];
+              $razon=$_POST['razon'];         
+              $promedio=$_POST['Promedio'];
+              $nacionalidad=$_POST['nacionalidad'];
+              $solicitudes=$_POST['solicitudes'];
+              $solicitud_actual=$_POST['Sol_actual'];
+              $aval=$_POST['aval'];
+              $cant_soli=$_POST['cant_soli'];
+              $fecha=$_POST['fecha']; 
+              $anio=$_POST['anio'];     
+            }
+            $periodo=tiempo_solicitud_retiro($anio,$fecha,$conn2);
+            $resultado=DESICION($fecha,$cedula,$razon,$nombre,$apellido,$discapacidad,$promedio,$solicitudes,$solicitud_actual,$aval,$cant_soli,$periodo,$conn,$conn2);
+            
+            }
+        }
+      ?>
 		</div>
     </div>
     
