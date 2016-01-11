@@ -20,7 +20,7 @@ if($usuario!= NULL)
 
   <!-- CSS  -->
   <link rel="stylesheet" type="text/css" href="../css/jquery.dataTables.css">
-  <link rel="stylesheet" type="text/css" href="../css/dataTables.editor.css">  
+  <!-- <link rel="stylesheet" type="text/css" href="../css/dataTables.editor.css">  -->
   <link href="https://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet">
   <link href="../css/materialize.css" type="text/css" rel="stylesheet" media="screen,projection"/>
   <link href="../css/style.css" type="text/css" rel="stylesheet" media="screen,projection"/>
@@ -66,9 +66,7 @@ if($usuario!= NULL)
   <div class="col m3 offset-m9">    
         <div class="user_container" id="user"><i class=" icon-user-check"></i>
           <span id="userName">        
-            <?php     
-              cargar_datos_coord($usuario,$conn);
-            ?>
+            
           </spam>
         </div>   
   </div>  
@@ -76,16 +74,41 @@ if($usuario!= NULL)
   <div class="container">
     <div class="section">
 
-    <div class="row">
-      <div class="col s12">      
-        <ul class="tabs">
-          <li id="historico" data-url="historico.php" class="tab col s3"><a href="#">Ver Histórico</a></li>
-          <li id="retiros" data-url="retiros.php" class="tab col s3"><a href="#">Retiros</a></li>
-          <li id="reingresos" data-url="reingreso.php" class="tab col s3"><a href="#">Reingresos</a></li>
-          <li id="CDE" data-url="cambio_especialid.php" class="tab col s3"><a href="#">Cambio de Especialidades</a></li>
-        </ul>        
-      </div>       
+    <div class="row">          
         <div id="principal" class="col s12"> 
+          <?php
+            $razon=$_POST['razon'];   //=     
+            $promedio=$_POST['promedio']; //=       
+            $solicitudes=$_POST['soli_ant']; //=
+            $solicitud_actual=$_POST['solicitud']; //=
+            $aval=$_POST['aval']; //=       
+            $tiempo_sol=$_POST['fecha'];  //=
+            $medidas=$_POST['medidas']; //=
+            $observaciones=$_POST['observaciones'];
+          ?>
+          <table id="mytable" class="display" style="text-align:center" cellspacing="0" width="100%">
+            <thead>
+                <tr>
+                    <th>cedula</th>
+                    <th>solicitud actual</th>
+                    <th>fecha de solicitud</th>
+                    <th>razon</th>  
+                    <th>resultado</th>   
+                    <th>Accion</th>            
+                </tr>
+            </thead>        
+            <tfoot>
+                <tr>
+                    <th>cedula</th>
+                    <th>solicitud actual</th>
+                    <th>fecha de solicitud</th>
+                    <th>razon</th>  
+                    <th>resultado</th>   
+                    <th>Accion</th>              
+                </tr>
+            </tfoot>
+        </table>  
+
         </div>
     </div> 
     </div> 
@@ -156,7 +179,52 @@ if($usuario!= NULL)
   <script src="https://code.jquery.com/jquery-2.1.4.min.js"></script>
   <script type="text/javascript" language="javascript" src="../js/jquery.dataTables.js"></script>  
   <script src="../js/materialize.js"></script> 
-  <script src="../js/init.js"></script>
+  <script>
+  
+    var razon = "<?php echo $razon ?>";
+    var promedio = "<?php echo $promedio ?>";
+    var solicitudes = "<?php echo $solicitudes ?>";
+    var solicitud_actual = "<?php echo $solicitud_actual ?>";
+    var aval = "<?php echo $aval ?>";
+    var tiempo_sol = "<?php $tiempo_sol ?>";
+    var medidas = "<?php $medidas ?>";
+
+    $(document).ready(function(){      
+        var datatable = $('#mytable').DataTable({                       
+                        "ajax": {
+                            "url": "../procesos/motor_funciones.php",
+                            "type": "POST",
+                            "data" : {
+                                      "accion" : "mostrar_valores_iguales", //nombre que recibe el switch  
+                                      "razon"  : razon,
+                                      "promedio" : promedio,
+                                      "solicitudes" : solicitudes,
+                                      "solicitud_actual" : solicitud_actual,
+                                      "aval" : aval,
+                                      "tiempo_sol" : tiempo_sol,
+                                      "medidas" : medidas
+                                    }
+                                    
+                       },
+                       "language": {
+                                     "processing": "No hay registros en el histórico",
+                                     "loadingRecords": " "                                     
+                                  },
+                        "sAjaxDataProp": "",
+                        "processing": true,
+                         columns: 
+                         [
+                            {data:"cedula"},
+                            {data:"solicitud"},                            
+                            {data:"fecha"},
+                            {data:"razon"},
+                            {data:"resultado"},
+                            {data:"link"}                        
+                          ]    
+                             
+                    }); 
+    });
+    </script>
   </body>
 </html>
 <?php

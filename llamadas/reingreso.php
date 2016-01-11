@@ -51,6 +51,10 @@ $bandera=$_SESSION['bandera'];
                                     "accion" : "mostrar_proceso_rei",   //nombre que recibe el switch    
                                     }
                        },
+                       "language": {
+                                     "processing": "No hay solicitudes nuevas",  
+                                     "loadingRecords": ""                                   
+                                  },
                         "sAjaxDataProp": "",
                         "processing": true,
                         "pageLength": 20,

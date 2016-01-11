@@ -264,10 +264,10 @@ function visualizar_historico($nivel,$conn)
 										"resultado"=>$resultado);
 									
 					$j++;
-					}
-					header('Content-type: application/json');
-					return json_encode($data);
+					}					
 				}
+				header('Content-type: application/json');
+				return json_encode($data);
 			
 			}
 				$conn->Close();			
@@ -576,15 +576,7 @@ function mostrar_datos_estudiante_sec($numero_soli,$cedula,$nombre,$apellido,$ra
 						      <option value="Si">Si</option>
 						      <option value="No">No</option>
 						    </select>
-						 </div>
-
-		                <!-- <div class="input-field col s6">             
-		                          <select class="browser-default" id="Aval" name="aval">
-		                            <option value="" disabled selected></option>
-		                            <option value="Si">Si</option>
-		                            <option value="No">No</option>                            
-		                          </select>
-		                </div>-->
+						 </div>		                
 		                <div class="input-field col s6 ">
                             <input id="discapacidad"  type="text" class="validate" disabled value="<?php echo $discapacidad; ?>">
                             <label for="discapacidad">¿Tiene discapacidad?</label>
@@ -1545,7 +1537,7 @@ function mostrar_decision($exp,$fecha_solicitud,$cedula,$pros_aca,$razon,$solici
                     </div>
                     <div class="row">
                          <?php
-							If($decision="Aprobada" || $decision="Reprobada")
+							If($decision=="Aprobada" || $decision=="Reprobada")
 							{
 							?>  							        
 							    <div class="input-field col s12 m6">             
@@ -1559,11 +1551,11 @@ function mostrar_decision($exp,$fecha_solicitud,$cedula,$pros_aca,$razon,$solici
 							}
 							else
 							{
-									If($decision="Indefinida")
+									If($decision=='Indefinida')
 									{
 							?>   
 								<div class="input-field col s12 m6"> 
-							        <select class="browser-default" id="desicion2" name="desicion2">
+							        <select class="browser-default" id="decision" name="decision">
 							        <option value="" disabled selected>Ya que el sistema no pudo decidir, tome la decision usted </option>>
 							        <option value="Aprobado">Aprobado</option>
 							        <option value="Reprobado">Reprobado</option>
@@ -1583,14 +1575,36 @@ function mostrar_decision($exp,$fecha_solicitud,$cedula,$pros_aca,$razon,$solici
                    </div>    
                     <div class="divider"></div>
                     <div class="row">                       
-                        <div class="col m12 offset">
+                        <div class="col m12">
                             <p class="center-align">
                                 <button class="btn btn-large waves-effect waves-light" id="crear" type="submit" value="ingresar_historico" name="accion" title="login">DECISION</button>
                             </p>
                         </div>
+                        
                     </div>
         </form> 
 	
+		<form class="col s12" id="decision" action="../llamadas/antecedentes.php" method="POST" target="_blank">
+           	        <input type="hidden" id="fecha_solicitud" name="fecha_solicitud" value="<?php echo $fecha_solicitud; ?>">
+        			<input type="hidden" id="nombre" name="nombre"  value="<?php echo $nombre; ?>">
+					<input type="hidden" id="exp" name="exp"  value="<?php echo $exp; ?>">
+			        <input type="hidden" id="cedula" name="cedula"  value="<?php echo $cedula; ?>">
+			        <input type="hidden" id="solicitud" name="solicitud" value="<?php echo $solicitud_actual ?>">
+			        <input type="hidden" id="razon" name="razon" value="<?php echo $razon ?>">
+			        <input type="hidden" id="fecha" name="fecha" value="<?php echo $tiempo_soli ?>">
+			        <input type="hidden" id="soli_ant" name="soli_ant"  value="<?php echo $solicitudes_anteriores; ?>">
+			        <input type="hidden" id="promedio" name="promedio"  value="<?php echo $pros_aca; ?>">
+			        <input type="hidden" id="medidas" name="medidas"  value="<?php echo $medidas_resul; ?>">
+			        <input type="hidden" id="aval" name="aval" value="<?php echo $razon_aval ?>"> 
+			        <input type="hidden" id="decision" name="decision" value="<?php echo $decision ?>">
+			        <div class="row">
+				     	<div class="col m12">
+	                            <p class="center-align">
+	                                <button class="btn btn-large waves-effect waves-light" id="crear" type="submit" value="mostrar_valores_iguales" name="accion"  title="login">ANTECEDENTES</button>
+	                            </p>
+	                    </div>
+	                </div>
+        </form> 
 <?php
 $conn->Close();
 $conn2->Close();
@@ -1644,92 +1658,7 @@ function ingresar_razon($proceso,$razon,$puntaje,$porcentaje,$fecha,$conn)
 	return($bandera);
 	$conn->Close();
 }
-/*============================================================================================================================	
-   FUNCION PARA LOS MENSAJES DE LOS PROCESOS   	
-   ======================================================================================================================*/
-function mensajes($bandera)
-{
 
-        if($bandera==1)
-        {	
-        ?>
-            <div >		
-                    Cuenta creada correctamente<br/>
-                    <br/>			
-            </div>
-
-		<?php
-        }
-        else
-        {
-            if($bandera==0)
-            {
-        ?>
-            <div >		
-                    Cuenta no creada, nombre de usuario ya usado <br/>
-                    <br/>			
-            </div>
-        <?php
-            }
-			else
-			{
-				if($bandera==2)
-            	{
-				?>
-						
-                   <div >		
-                    Razón ingresada correctamente <br/>
-                    <br/>			
-            </div>
-                 
-				<?php
-                }
-				else
-				{
-					if($bandera==3)
-					{
-					?>
-							
-					   <div >		
-                            Razón no ingresada<br/>
-                            <br/>			
-						</div>
-					 
-					<?php
-					}
-					else
-					{
-						if($bandera==4)
-						{
-						?>
-								
-						   <div >		
-							Cambios realizados <br/>
-							<br/>			
-					</div>
-						 
-						<?php
-						}
-						else
-						{
-							if($bandera==5)
-							{
-							?>
-									
-							   <div >		
-									Cambios no realizados<br/>
-									<br/>			
-								</div>
-							 
-							<?php
-							}
-							}
-							}
-						}
-					}
-				}
-        
-}
 /*============================================================================================================================	
 FUNCION PARA MOSTRAR LOS PUNTAJES DE LAS RAZONES   	
 ======================================================================================================================*/
@@ -2046,5 +1975,49 @@ function estudiar_decision($fecha,$cedula,$solicitud,$conn,$conn2)
         </script>
 <?php
 $conn->Close();
+}
+
+/*===================================================================================================================================================
+														FUNCION para mostrar solicitudes distintas
+=====================================================================================================================================================*/
+function visualizar_antecedentes($razon,$promedio,$solicitudes,$solicitud_actual,$aval,$tiempo_sol,$medidas,$conn)
+{	
+
+			$tiempo_sol=substr($tiempo_sol,0,20);
+			$solicitudes=substr($solicitudes,32);
+			$query="SELECT * FROM decisiones WHERE (tiempo_sol LIKE '$tiempo_sol%' AND aval LIKE '%$aval%' AND razon LIKE '%$razon%' AND solicitudes LIKE '%$solicitudes' AND medidas LIKE '%$medidas%' AND solicitud_actual LIKE '%$solicitud_actual%' AND promedio LIKE '%$promedio%')";	
+			$result=$conn->Execute($query);		
+			if($result==false)
+			{
+				echo "error al recuperar: ".$conn->ErrorMsg()."<br>" ;
+			}
+			else
+			{	$j=0;
+				while(!$result->EOF) 
+				{			
+					for ($i=0, $max=$result->FieldCount(); $i<$max; $i++)
+					{
+							$cedula=$result->fields[0];
+							$fecha=$result->fields[1];					
+							$solicitud=$result->fields[5];
+							$razon=$result->fields[2];	
+							$resultado=$result->fields[9];
+							$link="<a href=\"estudiar_historico.php?id=".$cedula."&soli=".$solicitud."&fecha=".$fecha."\" target='_blank'>Evaluar</a>";							
+							$result->MoveNext();											
+							break;	
+					}					
+					$data[$j]=array("cedula"=>$cedula,
+									"solicitud"=> $solicitud,
+									"fecha"=>$fecha,
+									"razon"=> $razon,
+									"resultado"=>$resultado,
+									"link"=>$link);
+					$j++;									
+				}
+				header('Content-type: application/json');
+				return json_encode($data);
+			
+			}
+				$conn->Close();			
 }
 ?>

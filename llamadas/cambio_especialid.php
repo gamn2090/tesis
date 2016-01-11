@@ -45,6 +45,10 @@ $bandera=$_SESSION['bandera'];
                                     "accion" : "mostrar_proceso_cde",   //nombre que recibe el switch    
                                     }
                        },
+                       "language": {
+                                     "processing": "No hay solicitudes nuevas",                                     
+                                     "loadingRecords": ""
+                                  },
                         "sAjaxDataProp": "",
                         "processing": true,
                        // "serverSide": true,

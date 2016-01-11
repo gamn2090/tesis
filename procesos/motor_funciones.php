@@ -84,11 +84,13 @@
 					$fecha=$_POST['fecha'];	
 					$medidas=$_POST['medidas'];	
 					$decision=$_POST['decision'];
-					$decision2=$_POST['decision2'];
 					$fecha_solicitud=$_POST['fecha_solicitud'];	
 					$acuerdo=$_POST['acuerdo'];
 					$observaciones=$_POST['observaciones'];			
-				
+					if($acuerdo==NULL)
+					{
+						$acuerdo='Si';
+					}
 						if($decision=="Indefinida")
 						{
 						$mensaje1=ingresar_historico($exp,$cedula,$fecha_solicitud,$razon,$promedio,$solicitudes,$solicitud_actual,$aval,$fecha,$medidas,$decision2,$observaciones,$acuerdo,$conn);
@@ -133,7 +135,24 @@
 				$razon=$_POST['razon'];
 				$fecha=fecha_hoy();
 				$funcion=ingresar_razon($proceso,$razon,$puntaje,$ponderacion,$fecha,$conn);				
-						header("location: ../coordinacion_principal.php?mensaje=$funcion");					
+				header("location: ../coordinacion_principal.php?mensaje=$funcion");					
+		break;
+		case 'mostrar_valores_iguales':
+
+				/*if($_POST['razon']!= NULL)
+				{
+					var_dump($conn);
+				}*/
+					$razon=$_POST['razon'];		//=			
+					$promedio=$_POST['promedio'];	//=				
+					$solicitudes=$_POST['soli_ant']; //=
+					$solicitud_actual=$_POST['solicitud']; //=
+					$aval=$_POST['aval'];	//=				
+					$tiempo_sol=$_POST['fecha'];	//=
+					$medidas=$_POST['medidas'];	//=
+					$observaciones=$_POST['observaciones'];	
+					$array=visualizar_antecedentes($razon,$promedio,$solicitudes,$solicitud_actual,$aval,$tiempo_sol,$medidas,$conn);	
+					echo $array;				
 		break;
 
 		}//fin switch	

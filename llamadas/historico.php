@@ -23,7 +23,7 @@ $bandera=$_SESSION['bandera'];
 </head>
 <body>
 
- 	<?php
+    <?php
     if($nivel==$bandera)
     {
     ?>
@@ -59,6 +59,10 @@ $bandera=$_SESSION['bandera'];
                                     "accion" : "mostrar_historico",   //nombre que recibe el switch    
                                     }
                        },
+                       "language": {
+                                     "processing": "No hay registros en el histórico",
+                                     "loadingRecords": " "                                     
+                                  },
                         "sAjaxDataProp": "",
                         "processing": true,
                          columns: 
@@ -77,9 +81,9 @@ $bandera=$_SESSION['bandera'];
     <?php
     }
     else
-    {	
+    {   
     ?>
-    	<table id="mytable" class="display" style="text-align:center" cellspacing="0" width="100%">
+        <table id="mytable" class="display" style="text-align:center" cellspacing="0" width="100%">
         <thead>
             <tr>
                 <th>cedula</th>
@@ -99,8 +103,8 @@ $bandera=$_SESSION['bandera'];
             </tr>
         </tfoot>
     </table>  
-    	<script>
-    	$(document).ready(function(){
+        <script>
+        $(document).ready(function(){
         var datatable = $('#mytable').DataTable({
                        "ajax": {
                             "url": "../procesos/motor_funciones.php",
@@ -109,6 +113,10 @@ $bandera=$_SESSION['bandera'];
                                     "accion" : "mostrar_historico",   //nombre que recibe el switch    
                                     }
                        },
+                       "language": {
+                                     "processing": "No hay registros en el histórico",
+                                     "loadingRecords": " "                                     
+                                  },    
                         "sAjaxDataProp": "",
                         "processing": true,
                        // "serverSide": true,
@@ -123,10 +131,10 @@ $bandera=$_SESSION['bandera'];
                           ]    
                              
                     }); 
-	    });
-	    </script>
-	<?php
-	}
+        });
+        </script>
+    <?php
+    }
     ?>
 
 <!--<script src="https://code.jquery.com/jquery-2.1.4.min.js"></script>

@@ -196,6 +196,7 @@ table.dataTable td.dt-left {
 table.dataTable th.dt-center,
 table.dataTable td.dt-center,
 table.dataTable td.dataTables_empty {
+  color: red;
   text-align: center;
 }
 table.dataTable th.dt-right,
