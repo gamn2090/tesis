@@ -1,34 +1,26 @@
 <?php
-  session_start();
+session_start();
       $usuario=$_SESSION['usuario'];
       $nivel=$_SESSION['nivel'];  
       $bandera=$_SESSION['bandera'];  
-  include ("../procesos/funciones.php");
-  include ("../config.php");
-  
-if($usuario!= NULL)
-{
 ?>
-<!DOCTYPE html>
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta http-equiv="Content-Type" content="text/html; charset=UTF-8"/>
-  <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1.0, user-scalable=no"/>
-
-  <title>Coordinación Académica</title>
-
-  <!-- CSS  -->
-  <link rel="stylesheet" type="text/css" href="../css/jquery.dataTables.css">
-  <!-- <link rel="stylesheet" type="text/css" href="../css/dataTables.editor.css">  -->
-  <link href="https://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet">
-  <link href="../css/materialize.css" type="text/css" rel="stylesheet" media="screen,projection"/>
+	<meta charset="UTF-8">
+	<title>ANTECEDENTES DE LA DECISION</title>
+	<link href="../css/materialize.css" type="text/css" rel="stylesheet" media="screen,projection"/>
   <link href="../css/style.css" type="text/css" rel="stylesheet" media="screen,projection"/>
+  <link rel="stylesheet" type="text/css" href="../css/jquery.dataTables.css">
   <link rel="stylesheet" href="../css/main.css">
   <link rel="stylesheet" href="../css/font.css">
+ <?php
+	include ("../procesos/funciones.php");
+	include ("../config.php");
+?>
 </head>
-<body>
-  <nav class="white" role="navigation">
+<body onload="myFunction()">
+<nav class="white" role="navigation">
     <div class="nav-wrapper container">
       <a id="logo-container" href="../coordinacion_principal.php" class="brand-logo"><img src="../img/udo.gif" alt=""></a>
       <ul class="right hide-on-med-and-down">
@@ -44,39 +36,28 @@ if($usuario!= NULL)
             <?php
             }
             ?>
-            <li><a href="cerrar_sesion.php">Cerrar sesion</a></li>
           </ul>
       </ul>
       <a href="#" data-activates="slide-out" class="button-collapse"><i class="mdi-navigation-menu">menu</i></a>
     </div>
   </nav>
-
+  
   <div id="index-banner" class="parallax-container">
     <div class="section no-pad-bot">
       <div class="container">
         <br><br>
-        <h1 id="nombre" class="header center blue-text text-darken-1">HISTORICO DE DECISIONES</h1>
+        <h1 id="nombre" class="header center blue-text text-darken-1">ANTECEDENTES</h1>
         <div class="row center">          
         </div>        
         <br><br>
       </div>
     </div>
-    <div  class="parallax"><img id="imagen" src="../img/historico.jpg" alt="Unsplashed background img 1"></div>
-  </div>
-  <div class="col m3 offset-m9">    
-        <div class="user_container" id="user"><i class=" icon-user-check"></i>
-          <span id="userName">        
-            
-          </spam>
-        </div>   
-  </div>  
+    <div  class="parallax"><img id="imagen" src="../img/Udo.jpg" alt="Unsplashed background img 1"></div>
+  </div>   
   <br><br>
-  <div class="container">
-    <div class="section">
-
-    <div class="row">          
-        <div id="principal" class="col s12"> 
-          <?php
+	<div class="container">
+		<div id="evaluar" class="content">
+			<?php
             $razon=$_POST['razon'];   //=     
             $promedio=$_POST['promedio']; //=       
             $solicitudes=$_POST['soli_ant']; //=
@@ -108,13 +89,11 @@ if($usuario!= NULL)
                 </tr>
             </tfoot>
         </table>  
-
-        </div>
-    </div> 
-    </div> 
-   </div> 
-
- <div class="slider">
+		
+		</div>
+    </div>
+    
+<div class="slider">
     <ul class="slides">
       <li>
         <img src="../img/udosucre.png"> <!-- random image -->
@@ -175,59 +154,59 @@ if($usuario!= NULL)
     </div>
   </footer>
 
+
   <!--  Scripts-->
   <script src="https://code.jquery.com/jquery-2.1.4.min.js"></script>
   <script type="text/javascript" language="javascript" src="../js/jquery.dataTables.js"></script>  
-  <script src="../js/materialize.js"></script> 
+  <script src="../js/materialize.js"></script>
+  <script src="../js/init.js"></script>
   <script>
-  
-    var razon = "<?php echo $razon ?>";
-    var promedio = "<?php echo $promedio ?>";
-    var solicitudes = "<?php echo $solicitudes ?>";
-    var solicitud_actual = "<?php echo $solicitud_actual ?>";
-    var aval = "<?php echo $aval ?>";
-    var tiempo_sol = "<?php $tiempo_sol ?>";
-    var medidas = "<?php $medidas ?>";
+    
+      var razon = "<?php echo $razon ?>";
+      var promedio = "<?php echo $promedio ?>";
+      var solicitudes = "<?php echo $solicitudes ?>";
+      var solicitud_actual = "<?php echo $solicitud_actual ?>";
+      var aval = "<?php echo $aval ?>";
+      var tiempo_sol = "<?php echo $tiempo_sol ?>";
+      var medidas = "<?php echo $medidas ?>";
 
-    $(document).ready(function(){      
-        var datatable = $('#mytable').DataTable({                       
-                        "ajax": {
-                            "url": "../procesos/motor_funciones.php",
-                            "type": "POST",
-                            "data" : {
-                                      "accion" : "mostrar_valores_iguales", //nombre que recibe el switch  
-                                      "razon"  : razon,
-                                      "promedio" : promedio,
-                                      "solicitudes" : solicitudes,
-                                      "solicitud_actual" : solicitud_actual,
-                                      "aval" : aval,
-                                      "tiempo_sol" : tiempo_sol,
-                                      "medidas" : medidas
-                                    }
-                                    
-                       },
-                       "language": {
-                                     "processing": "No hay registros en el histórico",
-                                     "loadingRecords": " "                                     
-                                  },
-                        "sAjaxDataProp": "",
-                        "processing": true,
-                         columns: 
-                         [
-                            {data:"cedula"},
-                            {data:"solicitud"},                            
-                            {data:"fecha"},
-                            {data:"razon"},
-                            {data:"resultado"},
-                            {data:"link"}                        
-                          ]    
-                             
-                    }); 
-    });
-    </script>
+      $(document).ready(function(){      
+          var datatable = $('#mytable').DataTable({                       
+                          "ajax": {
+                              "url": "../procesos/motor_funciones.php",
+                              "type": "POST",
+                              "data" : {
+                                        "accion" : "mostrar_valores_iguales", //nombre que recibe el switch  
+                                        "razon"  : razon,
+                                        "promedio" : promedio,
+                                        "soli_ant" : solicitudes,
+                                        "solicitud" : solicitud_actual,
+                                        "aval" : aval,
+                                        "fecha" : tiempo_sol,
+                                        "medidas" : medidas
+                                      }
+                                      
+                         },
+                         "language": {
+                                       "processing": "No hay antecedentes que concuerden con esta decisión",
+                                       "loadingRecords": " "                                     
+                                    },
+                          "sAjaxDataProp": "",
+                          "processing": true,
+                           columns: 
+                           [
+                              {data:"cedula"},
+                              {data:"solicitud"},                            
+                              {data:"fecha"},
+                              {data:"razon"},
+                              {data:"resultado"},
+                              {data:"link"}                        
+                            ]    
+                               
+                      }); 
+      });
+      </script>
+
+
   </body>
 </html>
-<?php
-}else
-{header("location: ../index.php");}
-?>
