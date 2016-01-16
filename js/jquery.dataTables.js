@@ -3476,7 +3476,7 @@
 		var select = $('<select/>', {
 			'name':          tableId+'_length',
 			'aria-controls': tableId,
-			'class':         classes.sLengthSelect
+			'class':         "browser-default"
 		} );
 	
 		for ( var i=0, ien=lengths.length ; i<ien ; i++ ) {

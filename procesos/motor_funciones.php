@@ -154,6 +154,12 @@
 					$array=visualizar_antecedentes($razon,$promedio,$solicitudes,$solicitud_actual,$aval,$tiempo_sol,$medidas,$conn);	
 					echo $array;				
 		break;
+		case 'cambios':
+				$demanda=$_POST['demanda'];
+				$carrera=$_POST['carrera'];
+				$oferta=$_POST['oferta'];
+
+		break;
 
 		}//fin switch	
 	}//fin isset[$_post[accion]]

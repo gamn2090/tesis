@@ -324,84 +324,187 @@ function mostrar_proceso($proceso,$bandera,$nivel,$conn,$conn2)
 			if($nivel==$bandera)
 			{
 				$query="SELECT * FROM solicitudes_cde WHERE (exp NOT LIKE '-1' AND exp NOT LIKE '0')";
-				$result=$conn->Execute($query);	
+				$result1=$conn->Execute($query);	
+				if($result1==false)
+				{
+					echo "error al recuperar: ".$conn->ErrorMsg()."<br>" ;
+				}
+				else
+				{		
+					$demanda=$result1->RowCount();
+					?>
+					<form id="Evaluar_estudiante" class="col s12" action="motor_funciones.php" method="POST">
+					    <input type="hidden" id="demanda" name="demanda"  value="<?php echo $demanda; ?>">
+   	
+					        <div class="row">
+	                        	<div class="input-field col s6 offset-s3">
+		                            <input id="oferta" name="oferta" type="text" class="validate" placeholder="Ingrese la cantidad de cupos" value="">
+		                            <label for="nombre">Cupos disponibles</label>
+					        	</div>
+					        </div>
+					        <div class="row">
+					        <div class="input-field col s6 offset-s3">
+						        <select class="browser-default" id="carrera" name="carrera">
+						        <?php 
+									$query2="SELECT * FROM esp";	
+									$result=$conn2->Execute($query2);
+									if($result==false)
+									{echo "error al recuperar: ".$conn2->ErrorMsg()."<br>" ;}
+									else
+									{	
+										?>
+										<option value="" disabled selected>Carrera</option>
+										<?php	
+										while(!$result->EOF) 
+											{			
+												for ($i=0, $max=$result->FieldCount(); $i<$max; $i++)
+												{
+													$codigo=$result->fields[0];	
+													$carrera=$result->fields[1];														
+												}	
+												?>
+						                        <option><?php echo $carrera; ?></option>
+						                        <?php					
+												$result->MoveNext();
+											}
+									}
+								?>						        
+						        </select>
+						    </div>
+						   	</div>
+                            <div class="divider"></div>
+		                    <div class="row">                       
+		                        <div class="col m12 offset">
+		                            <p class="center-align">
+		                                <button class="btn btn-large waves-effect waves-light" id="crear" type="submit" value="cambios" name="accion" title="login">Procesar Cambios</button>
+		                            </p>
+		                        </div>
+		                    </div>
+					</form>	
+					<?php
+					}
 			}
 			else
 			{
 				$query="SELECT * FROM solicitudes_cde WHERE (exp LIKE '-1')";
-				$result=$conn->Execute($query);	
-			}		
-			if($result==false)
-			{
-				echo "error al recuperar: ".$conn->ErrorMsg()."<br>" ;
-			}
-			else
-			{				
-				$j=0;
-				while(!$result->EOF) 
-				{			
-					for ($i=0, $max=$result->FieldCount(); $i<$max; $i++)
-					{
-						$numero_sol=$result->fields[1];
-						$cedula=$result->fields[0];
-						$razon=$result->fields[2];	
-						$carrera_actual=$result->fields[3];
-						$carrera_siguiente=$result->fields[4];
-						$cedula2=base64_encode ($cedula);
-						$numero_sol2=base64_encode ($numero_sol);
-						$link="<a href=\"evaluar.php?id=".$cedula2."&numero=".$numero_sol2."\" target='_blank'>Evaluar</a>";							
-						$query3="SELECT * FROM esp WHERE codigo LIKE '%$carrera_actual%'";
-						$result=$conn2->Execute($query3);
-						if($result==false)
+				$result=$conn->Execute($query);						
+				if($result==false)
+				{
+					echo "error al recuperar: ".$conn->ErrorMsg()."<br>" ;
+				}
+				else
+				{				
+					$j=0;
+					while(!$result->EOF) 
+					{			
+						for ($i=0, $max=$result->FieldCount(); $i<$max; $i++)
 						{
-							echo "error al recuperar: ".$conn2->ErrorMsg()."<br>" ;
-						}
-						else
-						{	
-							while(!$result->EOF) 
-							{			
-								for ($i=0, $max=$result->FieldCount(); $i<$max; $i++)
-								{	
-									$carrera_actual=$result->fields[1];
-								}
-								break;
+							$numero_sol=$result->fields[1];
+							$cedula=$result->fields[0];
+							$razon=$result->fields[2];	
+							$carrera_actual=$result->fields[3];
+							$carrera_siguiente=$result->fields[4];
+							$cedula2=base64_encode ($cedula);
+							$numero_sol2=base64_encode ($numero_sol);
+							$link="<a href=\"evaluar.php?id=".$cedula2."&numero=".$numero_sol2."\" target='_blank'>Evaluar</a>";							
+							$query3="SELECT * FROM esp WHERE codigo LIKE '%$carrera_actual%'";
+							$result=$conn2->Execute($query3);
+							if($result==false)
+							{
+								echo "error al recuperar: ".$conn2->ErrorMsg()."<br>" ;
 							}
-						}	
-						$query4="SELECT * FROM esp WHERE codigo LIKE '%$carrera_siguiente%'";
-						$result=$conn2->Execute($query4);
-						if($result==false)
-						{
-							echo "error al recuperar: ".$conn2->ErrorMsg()."<br>" ;
-						}
-						else
-						{	
-							while(!$result->EOF) 
-							{			
-								for ($i=0, $max=$result->FieldCount(); $i<$max; $i++)
-								{	
-									$carrera_siguiente=$result->fields[1];
+							else
+							{	
+								while(!$result->EOF) 
+								{			
+									for ($i=0, $max=$result->FieldCount(); $i<$max; $i++)
+									{	
+										$carrera_actual=$result->fields[1];
+									}
+									break;
 								}
-								break;
+							}	
+							$query4="SELECT * FROM esp WHERE codigo LIKE '%$carrera_siguiente%'";
+							$result=$conn2->Execute($query4);
+							if($result==false)
+							{
+								echo "error al recuperar: ".$conn2->ErrorMsg()."<br>" ;
 							}
-						}		
-						$result->MoveNext();											
-						break;	
-					}
-					$data[$j]=array("cedula"=>$cedula,
-									"numero"=> $numero_sol,
-									"carrera_a"=> $carrera_actual,
-									"carrera_s"=> $carrera_siguiente,
-									"link"=>$link);
-					$j++;
-				} 
-				header('Content-type: application/json');
-				return json_encode($data);				
+							else
+							{	
+								while(!$result->EOF) 
+								{			
+									for ($i=0, $max=$result->FieldCount(); $i<$max; $i++)
+									{	
+										$carrera_siguiente=$result->fields[1];
+									}
+									break;
+								}
+							}		
+							$result->MoveNext();											
+							break;	
+						}
+						$data[$j]=array("cedula"=>$cedula,
+										"numero"=> $numero_sol,
+										"carrera_a"=> $carrera_actual,
+										"carrera_s"=> $carrera_siguiente,
+										"link"=>$link);
+						$j++;
+					} 
+					header('Content-type: application/json');
+					return json_encode($data);				
+				}
 			}
 	}
 	$conn->Close();
 	$conn2->Close();
 }
 
+
+function ingresar_cambio($demanda,$oferta,$carrera,$conn)
+{
+	if(($demanda<$oferta) || $demanda==$oferta)
+	{
+		$id=1;
+		$query="SELECT * FROM esp WHERE (nombre LIKE '%$carrera%')";
+		$result=$conn2->Execute($query);
+		if($result==false)
+		{
+			echo "error al recuperar: ".$conn2->ErrorMsg()."<br>" ;
+		}
+		else
+		{				
+			$j=0;
+			while(!$result->EOF) 
+			{			
+				for ($i=0, $max=$result->FieldCount(); $i<$max; $i++)
+				{
+					$codigo=$result->fields[0];
+				}
+				$result->MoveNext();
+			}
+		}
+		$query2="SELECT * FROM solicitudes_cde WHERE exp NOT LIKE '-1' AND exp NOT LIKE '0' AND especialidad_quiere_estudiar LIKE '%$codigo%'";
+		$result=$conn->Execute($query2);	
+		if($result==false)
+		{
+			echo "error al recuperar: ".$conn->ErrorMsg()."<br>" ;
+		}
+		else
+		{				
+			
+		}
+	}
+	else
+	{
+		if($demanda>$oferta)
+		{
+			$id=2;
+
+		}		
+	}
+
+}
 /*============================================================================================================================
 					FUNCION PARA EL CALCULO DE LOS PARAMETROS DE LOS TOMADORES DE DECISIONES
 ============================================================================================================================*/
