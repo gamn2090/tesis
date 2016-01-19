@@ -59,15 +59,29 @@ session_start();
 	<div class="container">
 		<div id="evaluar" class="content">
 			<?php
-        if(isset($_GET['mensaje']) && $_GET['mensaje']==0)
+        if((isset($_GET['mensaje']) && $_GET['mensaje']==0) || (isset($_GET['mensaje']) && $_GET['mensaje']==3) )
         {
-          echo "Resultado guardado en el historico exitosamente";
+          ?>    
+                <script>
+                    function myFunction() {
+                        alert("Resultado guardado en el historico exitosamente");
+                        window.close();
+                    }
+                </script>
+          <?php
         }
         else
         {
-          if(isset($_GET['mensaje']) && $_GET['mensaje']==1)
+          if((isset($_GET['mensaje']) && $_GET['mensaje']==1) || (isset($_GET['mensaje']) && $_GET['mensaje']==4))
           {
-            echo "Resultado no guardado en el historico";
+            ?>    
+                  <script>
+                      function myFunction() {
+                          alert("Resultado no guardado en el historico exitosamente");
+                          window.close();
+                      }
+                  </script>
+            <?php
           }
           else
           {     

@@ -333,7 +333,7 @@ function mostrar_proceso($proceso,$bandera,$nivel,$conn,$conn2)
 				{		
 					$demanda=$result1->RowCount();
 					?>
-					<form id="Evaluar_estudiante" class="col s12" action="motor_funciones.php" method="POST">
+					<form id="Evaluar_estudiante" class="col s12" action="../procesos/motor_funciones.php" target="_blank" method="POST">
 					    <input type="hidden" id="demanda" name="demanda"  value="<?php echo $demanda; ?>">
    	
 					        <div class="row">
@@ -353,7 +353,7 @@ function mostrar_proceso($proceso,$bandera,$nivel,$conn,$conn2)
 									else
 									{	
 										?>
-										<option value="" disabled selected>Carrera</option>
+										<option value="" disabled selected>Carrera a optar</option>
 										<?php	
 										while(!$result->EOF) 
 											{			
@@ -460,12 +460,11 @@ function mostrar_proceso($proceso,$bandera,$nivel,$conn,$conn2)
 	$conn2->Close();
 }
 
-
-function ingresar_cambio($demanda,$oferta,$carrera,$conn)
+/*============================================================================================================================
+					FUNCION PARA APROBAR O RECHAZAR CAMBIOS
+==============================================================================================================================*/
+function ingresar_cambio($demanda,$oferta,$carrera,$conn,$conn2)
 {
-	if(($demanda<$oferta) || $demanda==$oferta)
-	{
-		$id=1;
 		$query="SELECT * FROM esp WHERE (nombre LIKE '%$carrera%')";
 		$result=$conn2->Execute($query);
 		if($result==false)
@@ -473,8 +472,7 @@ function ingresar_cambio($demanda,$oferta,$carrera,$conn)
 			echo "error al recuperar: ".$conn2->ErrorMsg()."<br>" ;
 		}
 		else
-		{				
-			$j=0;
+		{					
 			while(!$result->EOF) 
 			{			
 				for ($i=0, $max=$result->FieldCount(); $i<$max; $i++)
@@ -484,7 +482,11 @@ function ingresar_cambio($demanda,$oferta,$carrera,$conn)
 				$result->MoveNext();
 			}
 		}
-		$query2="SELECT * FROM solicitudes_cde WHERE exp NOT LIKE '-1' AND exp NOT LIKE '0' AND especialidad_quiere_estudiar LIKE '%$codigo%'";
+
+	if(($demanda<$oferta) || $demanda==$oferta)
+	{
+		$id=3;		
+		$query2="SELECT * FROM solicitudes_cde WHERE (exp NOT LIKE '-1') AND (exp NOT LIKE '0') AND (especialidad_quiere_estudiar LIKE '%$codigo%')";
 		$result=$conn->Execute($query2);	
 		if($result==false)
 		{
@@ -492,15 +494,372 @@ function ingresar_cambio($demanda,$oferta,$carrera,$conn)
 		}
 		else
 		{				
-			
+			while(!$result->EOF) 
+			{			
+				for ($i=0, $max=$result->FieldCount(); $i<$max; $i++)
+				{
+					$cedula=$result->fields[0];
+					$razon=$result->fields[2];
+					$fecha_solicitud=$result->fields[5];
+					$exp=$result->fields[6];				
+				}
+					$query3="SELECT * FROM estudiante WHERE (ced LIKE '%$cedula%')";
+					$result=$conn2->Execute($query3);
+					if($result==false)
+					{
+						echo "error al recuperar: ".$conn->ErrorMsg()."<br>" ;
+					}
+					else
+					{				
+						while(!$result->EOF) 
+						{			
+							for ($i=0, $max=$result->FieldCount(); $i<$max; $i++)
+							{
+								$promedio=$result->fields[25];					
+								$nombre=$result->fields[3];
+							}
+							$result->MoveNext();
+						}
+						if($promedio>5)
+						{
+							$promedio='Tiene promedio positivo, '.$promedio.'/10';
+						}
+						else
+						{
+							$promedio='Tiene promedio negativo, '.$promedio.'/10';
+						}
+					}
+					$anio=obtener_anio();
+					$tiempo_sol=tiempo_solicitud_retiro($anio,$fecha_solicitud,$conn2);
+					if($tiempo_sol==-1)
+					{
+						$fecha='Ingreso la solicitud en el tiempo estimado';
+					}
+					else
+					{
+						$fecha='No ingreso la solicitud en el tiempo estimado, la ingreso '.$tiempo_sol.' dias tarde';
+					}
+					$solicitud_actual='Cambio';
+					$aval='Presentó aval por la razon';
+
+
+					$solicitudes1=buscar_control_estudio($cedula,$conn2,'Cambio');
+					$solicitudes2=buscar_historico($cedula,$conn,'Cambio');
+					if(($solicitudes1==0) && ($solicitudes2==0))
+					{
+						$solicitudes="No tiene";	
+					}
+					else
+					{
+						$solicitudes="Si tiene";	
+					}		
+					if($nombre!=NULL)
+					{
+						$algo=1;
+					}
+					else
+					{
+						$algo=0;
+					}				
+					
+					if($algo==1)
+					{
+						$cant_soli1=cantidad_solicitud_historico($cedula,'Cambio',$conn);
+						$cant_soli2=cantidad_solicitud_control_estudio($cedula,'Cambio',$conn2);
+						if(($cant_soli1+$cant_soli2)==0)
+						{
+							$cant_soli=0;	
+						}
+						else
+						{
+							$cant_soli=$cant_soli1+$cant_soli2;	
+						}
+						$solicitudes="El estudiante tiene ".$cant_soli." Solicitudes anteriores";
+					}
+					$medi=0;
+					$query4="SELECT * FROM medidas_academicas WHERE cedula LIKE '%$cedula%'";
+					$result=$conn2->Execute($query4);
+					if($result==false)
+					{echo "error al recuperar: ".$conn2->ErrorMsg()."<br>" ;
+						
+					}	
+					else
+					{
+						while(!$result->EOF) 
+						{			
+							$medi=1;
+							$result->MoveNext();
+						}			
+					}
+					if($medi==0)
+					{
+						$medidas="No tiene medidas";
+					}
+					else
+					{
+						$medidas="Tiene medidas";
+					}
+					$decision='Aprobado';
+					$acuerdo='Si';
+					$observaciones='Cambio a '.$carrera;
+
+					ingresar_historico($exp,$cedula,$fecha_solicitud,$razon,$promedio,$solicitudes,$solicitud_actual,$aval,$fecha,$medidas,$decision,$observaciones,$acuerdo,$conn);
+				$result->MoveNext();	
+			}
+							
 		}
-	}
+		return $id;
+	}	
 	else
 	{
 		if($demanda>$oferta)
 		{
-			$id=2;
+			$id=4;
+			$query2="SELECT * FROM solicitudes_cde WHERE (exp NOT LIKE '-1' AND exp NOT LIKE '0' AND especialidad_quiere_estudiar LIKE '%$codigo%') LIMIT $oferta";
+			$result=$conn->Execute($query2);	
+			if($result==false)
+			{
+				echo "error al recuperar: ".$conn->ErrorMsg()."<br>" ;
+			}
+			else
+			{				
+				while(!$result->EOF) 
+				{			
+					for ($i=0, $max=$result->FieldCount(); $i<$max; $i++)
+					{
+						$cedula=$result->fields[0];
+						$razon=$result->fields[2];
+						$fecha_solicitud=$result->fields[5];
+						$exp=$result->fields[6];				
+					}
+						$query3="SELECT * FROM estudiante WHERE (ced LIKE '%$cedula%')";
+						$result=$conn2->Execute($query3);
+						if($result==false)
+						{
+							echo "error al recuperar: ".$conn->ErrorMsg()."<br>" ;
+						}
+						else
+						{				
+							while(!$result->EOF) 
+							{			
+								for ($i=0, $max=$result->FieldCount(); $i<$max; $i++)
+								{
+									$promedio=$result->fields[25];					
+									$nombre=$result->fields[3];
+								}
+								$result->MoveNext();
+							}
+							if($promedio>5)
+							{
+								$promedio='Tiene promedio positivo, '.$promedio.'/10';
+							}
+							else
+							{
+								$promedio='Tiene promedio negativo, '.$promedio.'/10';
+							}
+						}
+						$anio=obtener_anio();
+						$tiempo_sol=tiempo_solicitud_retiro($anio,$fecha_solicitud,$conn2);
+						if($tiempo_sol==-1)
+						{
+							$fecha='Ingreso la solicitud en el tiempo estimado';
+						}
+						else
+						{
+							$fecha='No ingreso la solicitud en el tiempo estimado, la ingreso '.$tiempo_sol.' dias tarde';
+						}
+						$solicitud_actual='Cambio';
+						$aval='Presentó aval por la razon';
 
+
+						$solicitudes1=buscar_control_estudio($cedula,$conn2,'Cambio');
+						$solicitudes2=buscar_historico($cedula,$conn,'Cambio');
+						if(($solicitudes1==0) && ($solicitudes2==0))
+						{
+							$solicitudes="No tiene";	
+						}
+						else
+						{
+							$solicitudes="Si tiene";	
+						}		
+						if($nombre!=NULL)
+						{
+							$algo=1;
+						}
+						else
+						{
+							$algo=0;
+						}						
+						
+						if($algo==1)
+						{
+							$cant_soli1=cantidad_solicitud_historico($cedula,'Cambio',$conn);
+							$cant_soli2=cantidad_solicitud_control_estudio($cedula,'Cambio',$conn2);
+							if(($cant_soli1+$cant_soli2)==0)
+							{
+								$cant_soli=0;	
+							}
+							else
+							{
+								$cant_soli=$cant_soli1+$cant_soli2;	
+							}
+							$solicitudes="El estudiante tiene ".$cant_soli." Solicitudes anteriores";
+						}
+						$medi=0;
+						$query4="SELECT * FROM medidas_academicas WHERE cedula LIKE '%$cedula%'";
+						$result=$conn2->Execute($query4);
+						if($result==false)
+						{echo "error al recuperar: ".$conn2->ErrorMsg()."<br>" ;
+							
+						}	
+						else
+						{
+							while(!$result->EOF) 
+							{			
+								$medi=1;
+								$result->MoveNext();
+							}			
+						}
+						if($medi==0)
+						{
+							$medidas="No tiene medidas";
+						}
+						else
+						{
+							$medidas="Tiene medidas";
+						}
+						$decision='Aprobado';
+						$acuerdo='Si';
+						$observaciones='Cambio a '.$carrera;
+					$result->MoveNext();	
+				}
+				ingresar_historico($exp,$cedula,$fecha_solicitud,$razon,$promedio,$solicitudes,$solicitud_actual,$aval,$fecha,$medidas,$decision,$observaciones,$acuerdo,$conn);
+
+			}
+			$query10="SELECT * FROM solicitudes_cde WHERE (exp NOT LIKE '-1') AND (exp NOT LIKE '0') AND (especialidad_quiere_estudiar LIKE '%$codigo%') LIMIT $oferta";
+			$result=$conn->Execute($query10);	
+			if($result==false)
+			{
+				echo "error al recuperar: ".$conn->ErrorMsg()."<br>" ;
+			}
+			else
+			{				
+				while(!$result->EOF) 
+				{			
+					for ($i=0, $max=$result->FieldCount(); $i<$max; $i++)
+					{
+						$cedula=$result->fields[0];
+						$razon=$result->fields[2];
+						$fecha_solicitud=$result->fields[5];
+						$exp=$result->fields[6];				
+					}
+						$query12="SELECT * FROM estudiante WHERE (ced LIKE '%$cedula%')";
+						$result=$conn2->Execute($query12);
+						if($result==false)
+						{
+							echo "error al recuperar: ".$conn->ErrorMsg()."<br>" ;
+						}
+						else
+						{				
+							while(!$result->EOF) 
+							{			
+								for ($i=0, $max=$result->FieldCount(); $i<$max; $i++)
+								{
+									$promedio=$result->fields[25];					
+									$nombre=$result->fields[3];
+								}
+								$result->MoveNext();
+							}
+							if($promedio>5)
+							{
+								$promedio='Tiene promedio positivo, '.$promedio.'/10';
+							}
+							else
+							{
+								$promedio='Tiene promedio negativo, '.$promedio.'/10';
+							}
+						}
+						$anio=obtener_anio();
+						$tiempo_sol=tiempo_solicitud_retiro($anio,$fecha_solicitud,$conn2);
+						if($tiempo_sol==-1)
+						{
+							$fecha='Ingreso la solicitud en el tiempo estimado';
+						}
+						else
+						{
+							$fecha='No ingreso la solicitud en el tiempo estimado, la ingreso '.$tiempo_sol.' dias tarde';
+						}
+						$solicitud_actual='Cambio';
+						$aval='Presentó aval por la razon';
+
+
+						$solicitudes1=buscar_control_estudio($cedula,$conn2,'Cambio');
+						$solicitudes2=buscar_historico($cedula,$conn,'Cambio');
+						if(($solicitudes1==0) && ($solicitudes2==0))
+						{
+							$solicitudes="No tiene";	
+						}
+						else
+						{
+							$solicitudes="Si tiene";	
+						}		
+						if($nombre!=NULL)
+						{
+							$algo=1;
+						}
+						else
+						{
+							$algo=0;
+						}						
+						
+						if($algo==1)
+						{
+							$cant_soli1=cantidad_solicitud_historico($cedula,'Cambio',$conn);
+							$cant_soli2=cantidad_solicitud_control_estudio($cedula,'Cambio',$conn2);
+							if(($cant_soli1+$cant_soli2)==0)
+							{
+								$cant_soli=0;	
+							}
+							else
+							{
+								$cant_soli=$cant_soli1+$cant_soli2;	
+							}
+							$solicitudes="El estudiante tiene ".$cant_soli." Solicitudes anteriores";
+						}
+						$medi=0;
+						$query11="SELECT * FROM medidas_academicas WHERE cedula LIKE '%$cedula%'";
+						$result=$conn2->Execute($query11);
+						if($result==false)
+						{echo "error al recuperar: ".$conn2->ErrorMsg()."<br>" ;
+							
+						}	
+						else
+						{
+							while(!$result->EOF) 
+							{			
+								$medi=1;
+								$result->MoveNext();
+							}			
+						}
+						if($medi==0)
+						{
+							$medidas="No tiene medidas";
+						}
+						else
+						{
+							$medidas="Tiene medidas";
+						}
+						$decision='Reprobado';
+						$acuerdo='Si';
+						$observaciones='Cambio a '.$carrera;
+					$result->MoveNext();	
+				}	
+				ingresar_historico($exp,$cedula,$fecha_solicitud,$razon,$promedio,$solicitudes,$solicitud_actual,$aval,$fecha,$medidas,$decision,$observaciones,$acuerdo,$conn);
+	
+
+			}
+
+			return $id;
 		}		
 	}
 
@@ -540,11 +899,7 @@ function cargar_datos_estudiante($numero_soli,$cedula,$nivel,$conn2,$conn)
 	else
 	{
 		$solicitudes="Si tiene";	
-	}
-	
-/*==========================================================================================================================	
-	
-==========================================================================================================================*/	
+	}		
 	
 	$query="SELECT * FROM estudiante WHERE (ced LIKE '%$cedula%')";	
 	$result=$conn2->Execute($query);
@@ -1321,7 +1676,7 @@ function obtener_anio()
 	return $year;
 }
 /*============================================================================================================================
-					FUNCION PARA SABER SI ESTÁ A TIEMPO O NO
+					FUNCION PARA SABER SI ESTÁ A TIEMPO O NO (RETIRO)
 ==============================================================================================================================*/
 function tiempo_solicitud_retiro($anio,$fecha,$conn2)
 {
@@ -1335,12 +1690,12 @@ function tiempo_solicitud_retiro($anio,$fecha,$conn2)
 		{			
 			for ($i=0, $max=$result->FieldCount(); $i<$max; $i++)
 			{
-				$fecha_inicio_sem=$result->fields['3'];
-				$fecha_fin_sem=$result->fields['4'];
+				$fecha_inicio_sem=$result->fields[3];
+				$fecha_fin_sem=$result->fields[4];
 				if(valida_fecha($fecha_inicio_sem, $fecha_fin_sem, $fecha))
 				{
-					$fecha_inicio_ret=$result->fields['14'];
-					$fecha_fin_ret=$result->fields['15'];
+					$fecha_inicio_ret=$result->fields[14];
+					$fecha_fin_ret=$result->fields[15];
 				}
 			}
 			$result->MoveNext();
@@ -1358,7 +1713,84 @@ function tiempo_solicitud_retiro($anio,$fecha,$conn2)
 	return $cant_dias;
 	$conn2->Close();
 }
+/*============================================================================================================================
+					FUNCION PARA SABER SI ESTÁ A TIEMPO O NO (CDE)
+==============================================================================================================================*/
 
+function tiempo_solicitud_cde($anio,$fecha,$conn2)
+{
+	$query="SELECT * FROM periodo WHERE (ano LIKE '%$anio%')";	
+	$result=$conn2->Execute($query);
+	if($result==false)
+	{echo "error al recuperar: ".$conn2->ErrorMsg()."<br>" ;}
+	else
+	{
+		while(!$result->EOF) 
+		{			
+			for ($i=0, $max=$result->FieldCount(); $i<$max; $i++)
+			{
+				$fecha_inicio_sem=$result->fields[3];
+				$fecha_fin_sem=$result->fields[4];
+				if(valida_fecha($fecha_inicio_sem, $fecha_fin_sem, $fecha))
+				{
+					$fecha_inicio_cde=$result->fields[12];
+					$fecha_fin_cde=$result->fields[13];
+				}
+			}
+			$result->MoveNext();
+		}
+	}	
+
+	if(valida_fecha($fecha_inicio_cde, $fecha_fin_cde, $fecha)) 
+	{
+		$cant_dias='-1';
+	}
+	else
+	{
+		$cant_dias=date_diff($fecha_fin_cde, $fecha);	
+	}
+	return $cant_dias;
+	$conn2->Close();
+}
+/*============================================================================================================================
+					FUNCION PARA SABER SI ESTÁ A TIEMPO O NO (REINGRESO)
+==============================================================================================================================*/
+
+function tiempo_solicitud_reingreso($anio,$fecha,$conn2)
+{
+	$query="SELECT * FROM periodo WHERE (ano LIKE '%$anio%')";	
+	$result=$conn2->Execute($query);
+	if($result==false)
+	{echo "error al recuperar: ".$conn2->ErrorMsg()."<br>" ;}
+	else
+	{
+		while(!$result->EOF) 
+		{			
+			for ($i=0, $max=$result->FieldCount(); $i<$max; $i++)
+			{
+				$fecha_inicio_sem=$result->fields[3];
+				$fecha_fin_sem=$result->fields[4];
+				if(valida_fecha($fecha_inicio_sem, $fecha_fin_sem, $fecha))
+				{
+					$fecha_inicio_ret=$result->fields[14];
+					$fecha_fin_ret=$result->fields[15];
+				}
+			}
+			$result->MoveNext();
+		}
+	}	
+
+	if(valida_fecha($fecha_inicio_ret, $fecha_fin_ret, $fecha)) 
+	{
+		$cant_dias='-1';
+	}
+	else
+	{
+		$cant_dias=date_diff($fecha_fin_ret, $fecha);	
+	}
+	return $cant_dias;
+	$conn2->Close();
+}
 /*============================================================================================================================
 					FUNCION PARA SABER el periodo en el que se hace la solicitud
 ==============================================================================================================================*/
@@ -1375,11 +1807,11 @@ function saber_periodo($anio,$fecha,$conn2)
 		{			
 			for ($i=0, $max=$result->FieldCount(); $i<$max; $i++)
 			{
-				$fecha_inicio_sem=$result->fields['3'];
-				$fecha_fin_sem=$result->fields['4'];
+				$fecha_inicio_sem=$result->fields[3];
+				$fecha_fin_sem=$result->fields[4];
 				if(valida_fecha($fecha_inicio_sem, $fecha_fin_sem, $fecha))
 				{
-					$periodo=$result->fields['1'];
+					$periodo=$result->fields[1];
 				}
 			}
 			$result->MoveNext();
@@ -1393,7 +1825,7 @@ function saber_periodo($anio,$fecha,$conn2)
 ==============================================================================================================================*/
 function valida_fecha($inicio, $fin, $validar) 
 { 
-    if(strtotime($validar)>strtotime($inicio) && strtotime($validar)<strtotime($fin)) 
+    if(strtotime($validar)>=strtotime($inicio) && strtotime($validar)<=strtotime($fin)) 
 		return true; 
     else 
 		return false; 
@@ -1920,7 +2352,7 @@ function ingresar_historico($exp,$cedula,$fecha_solicitud,$razon,$promedio,$soli
 	$query= "INSERT INTO decisiones (cedula, fecha_solicitud, razon, promedio, solicitudes, solicitud_actual, aval, medidas, tiempo_sol, decision, observaciones, acuerdo, exp) VALUES ('$cedula', '$fecha_solicitud', '$razon', '$promedio', '$solicitudes', '$solicitud_actual', '$aval', '$medidas', '$fecha', '$decision', '$observaciones', '$acuerdo', '$exp')"; 
 	if($conn->Execute($query)==false)
 	{
-		//$bandera=1;
+		$bandera=1;
 		echo "error al recuperar: ".$conn->ErrorMsg()."<br>" ;
 	}
 	else
@@ -1928,7 +2360,7 @@ function ingresar_historico($exp,$cedula,$fecha_solicitud,$razon,$promedio,$soli
 		$bandera=0;
 		if(($solicitud_actual =='Retiro') || ($solicitud_actual =='Reingreso'))
 		{
-			$query2= "DELETE FROM solicitudes WHERE proceso LIKE '%$solicitud_actual%' AND fecha_solicitud='%$fecha_solicitud%' AND cedula LIKE '%$cedula%'"; 
+			$query2= "DELETE FROM solicitudes WHERE proceso LIKE '%$solicitud_actual%' AND fecha_solicitud='%$fecha_solicitud%' AND cedula LIKE '%$cedula%' AND (exp LIKE '%exp%')"; 
 			if($conn->Execute($query2)==false)
 			{
 				echo "error al recuperar: ".$conn->ErrorMsg()."<br>" ;
@@ -1936,7 +2368,7 @@ function ingresar_historico($exp,$cedula,$fecha_solicitud,$razon,$promedio,$soli
 		}
 		else
 		{
-			$query2= "DELETE FROM solicitud_cde WHERE (fecha_solicitud LIKE '%$fecha_solicitud%') AND (cedula LIKE '%$cedula%')"; 
+			$query2= "DELETE FROM solicitudes_cde WHERE fecha_solicitud='%$fecha_solicitud%' AND cedula LIKE '%$cedula%' "; 
 			if($conn->Execute($query2)==false)
 			{
 				echo "error al recuperar: ".$conn->ErrorMsg()."<br>" ;

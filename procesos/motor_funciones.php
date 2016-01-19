@@ -158,6 +158,8 @@
 				$demanda=$_POST['demanda'];
 				$carrera=$_POST['carrera'];
 				$oferta=$_POST['oferta'];
+				$mensaje=ingresar_cambio($demanda,$oferta,$carrera,$conn,$conn2);
+				header("location: ../llamadas/resultado.php?mensaje=$mensaje");
 
 		break;
 
