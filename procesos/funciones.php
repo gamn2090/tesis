@@ -281,7 +281,7 @@ function mostrar_proceso($proceso,$bandera,$nivel,$conn,$conn2)
 	{		
 		if($nivel==$bandera)
 		{
-			$query="SELECT * FROM solicitudes WHERE (proceso LIKE '$proceso%' AND exp NOT LIKE '-1' AND exp NOT LIKE '0')";
+			$query="SELECT * FROM solicitudes WHERE (proceso LIKE '$proceso%' AND exp NOT LIKE '-1')";
 			$result=$conn->Execute($query);	
 		}
 		else
@@ -614,8 +614,8 @@ function ingresar_cambio($demanda,$oferta,$carrera,$conn,$conn2)
 	{
 		if($demanda>$oferta)
 		{
-			$id=4;
-			$query2="SELECT * FROM solicitudes_cde WHERE (exp NOT LIKE '-1' AND exp NOT LIKE '0' AND especialidad_quiere_estudiar LIKE '%$codigo%') LIMIT $oferta";
+			
+			$query2="SELECT * FROM solicitudes_cde WHERE (exp NOT LIKE '-1' AND especialidad_quiere_estudiar LIKE '%$codigo%') ORDER BY promedio DESC LIMIT $oferta";
 			$result=$conn->Execute($query2);	
 			if($result==false)
 			{
@@ -2336,8 +2336,8 @@ function actualizar_puntaje($proceso,$razon,$puntaje,$fecha,$conn)
  FUNCION PARA INGRESAR EN LA BASE DE DATOS HISTORICA  	
  ======================================================================================================================*/
 
-function ingresar_historico($exp,$cedula,$fecha_solicitud,$razon,$promedio,$solicitudes,$solicitud_actual,$aval,$fecha,$medidas,$decision,$observaciones,$acuerdo,$conn)
-{
+function ingresar_historico($exp,$cedula,$fecha_solicitud,$razon,$promedio,$solicitudes,$solicitud_actual,$aval,$fecha,$medidas,$decision,$observaciones,$acuerdo,$conn,$conn2)
+{	$anio=obtener_anio();
 	if($acuerdo=='No')
 	{
 		if($decision=="Aprobado")
@@ -2348,8 +2348,174 @@ function ingresar_historico($exp,$cedula,$fecha_solicitud,$razon,$promedio,$soli
 		{
 			$decision="Aprobado";
 		}
-	}		
-	$query= "INSERT INTO decisiones (cedula, fecha_solicitud, razon, promedio, solicitudes, solicitud_actual, aval, medidas, tiempo_sol, decision, observaciones, acuerdo, exp) VALUES ('$cedula', '$fecha_solicitud', '$razon', '$promedio', '$solicitudes', '$solicitud_actual', '$aval', '$medidas', '$fecha', '$decision', '$observaciones', '$acuerdo', '$exp')"; 
+	}	
+	if($exp=='0')
+	{
+		if($solicitud_actual=='Retiro')
+		{
+			$query="SELECT * FROM solicitudes WHERE exp LIKE 'RT-%'";	
+			$result=$conn->Execute($query);
+		}
+		else
+		{
+			if($solicitud_actual=='Reingreso')
+			{
+				$query="SELECT * FROM solicitudes WHERE exp LIKE 'RCC-%'";	
+				$result=$conn->Execute($query);
+			}
+			else
+			{
+				if($solicitud_actual=='Reingreso_tg')
+				{
+					$query="SELECT * FROM solicitudes WHERE exp LIKE 'RTG-%'";	
+					$result=$conn->Execute($query);
+				}
+				else
+				{
+					if($solicitud_actual=='Cambio')
+					{
+						$query="SELECT * FROM solicitudes WHERE exp LIKE 'CE-%'";	
+						$result=$conn->Execute($query);
+					}
+				}
+			}
+		}	
+		if($result==false)
+		{
+			echo "error al recuperar: ".$conn->ErrorMsg()."<br>" ;
+		}
+		else
+		{		
+			$cont=1;			
+			while(!$result->EOF) 
+			{	
+				for ($i=0, $max=$result->FieldCount(); $i<$max; $i++)
+				{
+					$exp=$result->fields[5];				
+				}	
+				if($exp != '-1' && $exp != '0')
+				{
+					$cont++;
+				}
+				$result->MoveNext();
+			}
+		}	
+
+		if($solicitud_actual=='Retiro')
+		{
+			$query="SELECT * FROM decisiones WHERE exp LIKE 'RT-%'";	
+			$result=$conn->Execute($query);
+		}
+		else
+		{
+			if($solicitud_actual=='Reingreso')
+			{
+				$query="SELECT * FROM decisiones WHERE exp LIKE 'RCC-%'";	
+				$result=$conn->Execute($query);
+			}
+			else
+			{
+				if($solicitud_actual=='Reingreso_tg')
+				{
+					$query="SELECT * FROM decisiones WHERE exp LIKE 'RTG-%'";	
+					$result=$conn->Execute($query);
+				}
+				else
+				{
+					if($solicitud_actual=='Cambio')
+					{
+						$query="SELECT * FROM decisiones WHERE exp LIKE 'CE-%'";	
+						$result=$conn->Execute($query);
+					}
+				}
+			}
+		}	
+		if($result==false)
+		{
+			echo "error al recuperar: ".$conn->ErrorMsg()."<br>" ;
+		}
+		else
+		{					
+			while(!$result->EOF) 
+			{	
+				for ($i=0, $max=$result->FieldCount(); $i<$max; $i++)
+				{
+					$exp=$result->fields[13];				
+				}	
+				if($exp != '-1' && $exp != '0')
+				{
+					$cont++;
+				}
+				$result->MoveNext();
+			}
+		}	
+
+		$anio=substr($anio, -2);
+		switch ($solicitud_actual)
+		{
+			case 'Retiro':					
+						$periodo=saber_periodo($anio,$fecha,$conn2);
+						$aval1="RT-".$cont.".".$anio.".".$periodo;
+						$query2="UPDATE solicitudes SET exp='$aval1' WHERE numero_soli= $numero_soli";
+						$result=$conn->Execute($query2);
+						if($result==false)
+						{
+							$bandera=0;
+						}
+						else
+						{	
+							$bandera=1;
+						}					
+			break;		
+			case 'Cambio':
+						$periodo=saber_periodo($anio,$fecha,$conn2);
+						$aval1="CE-".$cont.".".$anio.".".$periodo;
+						$query2="UPDATE solicitudes_cde SET exp='$aval1' WHERE numero_soli= $numero_soli";
+						$result=$conn->Execute($query2);
+						if($result==false)
+						{
+							$bandera=0;
+						}
+						else
+						{	
+							$bandera=1;
+						}	
+					
+			break;
+			case 'Reingreso':
+						$periodo=saber_periodo($anio,$fecha,$conn2);
+						$aval1="RCC-".$cont.".".$anio.".".$periodo;
+						$query2="UPDATE solicitudes SET exp='$aval1' WHERE numero_soli= $numero_soli";
+						$result=$conn->Execute($query2);
+						if($result==false)
+						{
+							$bandera=0;
+						}
+						else
+						{	
+							$bandera=1;
+						}	
+					
+			break;	
+				case 'Reingreso_tg':
+						$periodo=saber_periodo($anio,$fecha,$conn2);
+						$aval1="RTG-".$cont.".".$anio.".".$periodo;
+						$query2="UPDATE solicitudes SET exp='$aval1' WHERE numero_soli= $numero_soli";
+						$result=$conn->Execute($query2);
+						if($result==false)
+						{
+							$bandera=0;
+						}
+						else
+						{	
+							$bandera=1;
+						}						
+			break;	
+
+		}
+
+	}	
+	$query= "INSERT INTO decisiones (cedula, fecha_solicitud, razon, promedio, solicitudes, solicitud_actual, aval, medidas, tiempo_sol, decision, observaciones, acuerdo, exp) VALUES ('$cedula', '$fecha_solicitud', '$razon', '$promedio', '$solicitudes', '$solicitud_actual', '$aval', '$medidas', '$fecha', '$decision', '$observaciones', '$acuerdo', '$aval1')"; 
 	if($conn->Execute($query)==false)
 	{
 		$bandera=1;
@@ -2360,7 +2526,7 @@ function ingresar_historico($exp,$cedula,$fecha_solicitud,$razon,$promedio,$soli
 		$bandera=0;
 		if(($solicitud_actual =='Retiro') || ($solicitud_actual =='Reingreso'))
 		{
-			$query2= "DELETE FROM solicitudes WHERE proceso LIKE '%$solicitud_actual%' AND fecha_solicitud='%$fecha_solicitud%' AND cedula LIKE '%$cedula%' AND (exp LIKE '%exp%')"; 
+			$query2= "DELETE FROM solicitudes WHERE proceso LIKE '%$solicitud_actual%' AND fecha_solicitud='%$fecha_solicitud%' AND cedula LIKE '%$cedula%' AND exp LIKE '%$exp%'"; 
 			if($conn->Execute($query2)==false)
 			{
 				echo "error al recuperar: ".$conn->ErrorMsg()."<br>" ;
@@ -2368,7 +2534,7 @@ function ingresar_historico($exp,$cedula,$fecha_solicitud,$razon,$promedio,$soli
 		}
 		else
 		{
-			$query2= "DELETE FROM solicitudes_cde WHERE fecha_solicitud='%$fecha_solicitud%' AND cedula LIKE '%$cedula%' "; 
+			$query2= "DELETE FROM solicitudes_cde WHERE fecha_solicitud='%$fecha_solicitud%' AND cedula LIKE '%$cedula%' AND exp LIKE '%$exp%'"; 
 			if($conn->Execute($query2)==false)
 			{
 				echo "error al recuperar: ".$conn->ErrorMsg()."<br>" ;
