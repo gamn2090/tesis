@@ -28,7 +28,7 @@ $bandera=$_SESSION['bandera'];
             <tr>
                 <th>cedula</th>
                 <th>numero</th>
-                <th>razon</th>  
+                <th>grupo</th>  
                 <th>accion</th>               
             </tr>
         </thead>        
@@ -36,7 +36,7 @@ $bandera=$_SESSION['bandera'];
             <tr>
                 <th>cedula</th>
                 <th>numero</th>
-                <th>razon</th>  
+                <th>grupo</th>  
                  <th>accion</th>               
             </tr>
         </tfoot>
@@ -63,7 +63,7 @@ $bandera=$_SESSION['bandera'];
                          [
                             {data:"cedula"},
                             {data:"numero"},
-                            {data:"razon"},
+                            {data:"grupo"},
                             {data:"link"}                       
                           ]    
                              

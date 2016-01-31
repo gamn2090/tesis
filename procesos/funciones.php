@@ -277,7 +277,7 @@ function visualizar_historico($nivel,$conn)
 ============================================================================================================================*/
 
 function mostrar_proceso($proceso,$bandera,$nivel,$conn,$conn2)
-{   if($proceso=="Retiro" || $proceso=="Reingreso")
+{   if($proceso=="Retiro")
 	{		
 		if($nivel==$bandera)
 		{
@@ -299,13 +299,15 @@ function mostrar_proceso($proceso,$bandera,$nivel,$conn,$conn2)
 				while(!$result->EOF) 
 				{	
 					for ($i=0, $max=$result->FieldCount(); $i<$max; $i++)
-					{							
+					{	
+						$proceso=$result->fields[3];						
 						$cedula=$result->fields[0];
 						$numero_sol=$result->fields[1];
 						$razon=$result->fields[2];	
 						$cedula2=base64_encode($cedula);
 						$numero_sol2=base64_encode($numero_sol);
-						$link="<a href=\"evaluar.php?id=".$cedula2."&numero=".$numero_sol2."\" target='_blank'>Evaluar</a>";						
+						$proceso=base64_encode($proceso);
+						$link="<a href=\"evaluar.php?proceso=".$proceso."&id=".$cedula2."&numero=".$numero_sol2."\" target='_blank'>Evaluar</a>";						
 						$result->MoveNext();											
 						break;												
 					}
@@ -321,6 +323,8 @@ function mostrar_proceso($proceso,$bandera,$nivel,$conn,$conn2)
 	}
 	else
 	{
+		if($proceso=="Cambio")
+		{
 			if($nivel==$bandera)
 			{
 				$query="SELECT * FROM solicitudes_cde WHERE (exp NOT LIKE '-1' AND exp NOT LIKE '0')";
@@ -455,6 +459,54 @@ function mostrar_proceso($proceso,$bandera,$nivel,$conn,$conn2)
 					return json_encode($data);				
 				}
 			}
+		}
+		else
+		{
+			if($proceso=="Reingreso")
+			{	
+				if($nivel==$bandera)
+				{
+					$query="SELECT * FROM solicitudes_rein WHERE (proceso LIKE '$proceso%' AND exp NOT LIKE '-1')";
+					$result=$conn->Execute($query);	
+				}
+				else
+				{
+					$query="SELECT * FROM solicitudes_rein WHERE (proceso LIKE '$proceso%' AND exp LIKE '-1')";
+					$result=$conn->Execute($query);	
+				}		
+					if($result==false)
+					{
+						echo "error al recuperar: ".$conn->ErrorMsg()."<br>" ;
+					}
+					else
+					{		
+						$j=0;
+						while(!$result->EOF) 
+						{	
+							for ($i=0, $max=$result->FieldCount(); $i<$max; $i++)
+							{	
+								$proceso=$result->fields[3];						
+								$cedula=$result->fields[0];
+								$numero_sol=$result->fields[1];
+								$grupo=$result->fields[2];	
+								$cedula2=base64_encode($cedula);
+								$numero_sol2=base64_encode($numero_sol);
+								$proceso=base64_encode($proceso);
+								$link="<a href=\"evaluar.php?proceso=".$proceso."&id=".$cedula2."&numero=".$numero_sol2."\" target='_blank'>Evaluar</a>";						
+								$result->MoveNext();											
+								break;												
+							}
+							$data[$j]=array("cedula"=>$cedula,
+											"numero"=> $numero_sol,
+											"grupo"=> $grupo,
+											"link"=>$link);
+							$j++;
+						} 
+						header('Content-type: application/json');
+						return json_encode($data);
+					}
+			}
+		}
 	}
 	$conn->Close();
 	$conn2->Close();
@@ -529,7 +581,7 @@ function ingresar_cambio($demanda,$oferta,$carrera,$conn,$conn2)
 							$promedio='Tiene promedio negativo, '.$promedio.'/10';
 						}
 					}
-					$anio=obtener_anio();
+					$anio=obtener_anio($fecha_solicitud);
 					$tiempo_sol=tiempo_solicitud_retiro($anio,$fecha_solicitud,$conn2);
 					if($tiempo_sol==-1)
 					{
@@ -543,9 +595,8 @@ function ingresar_cambio($demanda,$oferta,$carrera,$conn,$conn2)
 					$aval='Presentó aval por la razon';
 
 
-					$solicitudes1=buscar_control_estudio($cedula,$conn2,'Cambio');
 					$solicitudes2=buscar_historico($cedula,$conn,'Cambio');
-					if(($solicitudes1==0) && ($solicitudes2==0))
+					if(($solicitudes2==0))
 					{
 						$solicitudes="No tiene";	
 					}
@@ -565,8 +616,7 @@ function ingresar_cambio($demanda,$oferta,$carrera,$conn,$conn2)
 					if($algo==1)
 					{
 						$cant_soli1=cantidad_solicitud_historico($cedula,'Cambio',$conn);
-						$cant_soli2=cantidad_solicitud_control_estudio($cedula,'Cambio',$conn2);
-						if(($cant_soli1+$cant_soli2)==0)
+						if($cant_soli1==0)
 						{
 							$cant_soli=0;	
 						}
@@ -658,7 +708,7 @@ function ingresar_cambio($demanda,$oferta,$carrera,$conn,$conn2)
 								$promedio='Tiene promedio negativo, '.$promedio.'/10';
 							}
 						}
-						$anio=obtener_anio();
+						$anio=obtener_anio($fecha_solicitud);
 						$tiempo_sol=tiempo_solicitud_retiro($anio,$fecha_solicitud,$conn2);
 						if($tiempo_sol==-1)
 						{
@@ -672,9 +722,8 @@ function ingresar_cambio($demanda,$oferta,$carrera,$conn,$conn2)
 						$aval='Presentó aval por la razon';
 
 
-						$solicitudes1=buscar_control_estudio($cedula,$conn2,'Cambio');
 						$solicitudes2=buscar_historico($cedula,$conn,'Cambio');
-						if(($solicitudes1==0) && ($solicitudes2==0))
+						if(($solicitudes2==0))
 						{
 							$solicitudes="No tiene";	
 						}
@@ -694,8 +743,7 @@ function ingresar_cambio($demanda,$oferta,$carrera,$conn,$conn2)
 						if($algo==1)
 						{
 							$cant_soli1=cantidad_solicitud_historico($cedula,'Cambio',$conn);
-							$cant_soli2=cantidad_solicitud_control_estudio($cedula,'Cambio',$conn2);
-							if(($cant_soli1+$cant_soli2)==0)
+							if($cant_soli1==0)
 							{
 								$cant_soli=0;	
 							}
@@ -779,7 +827,7 @@ function ingresar_cambio($demanda,$oferta,$carrera,$conn,$conn2)
 								$promedio='Tiene promedio negativo, '.$promedio.'/10';
 							}
 						}
-						$anio=obtener_anio();
+						$anio=obtener_anio($fecha_solicitud);
 						$tiempo_sol=tiempo_solicitud_retiro($anio,$fecha_solicitud,$conn2);
 						if($tiempo_sol==-1)
 						{
@@ -793,9 +841,8 @@ function ingresar_cambio($demanda,$oferta,$carrera,$conn,$conn2)
 						$aval='Presentó aval por la razon';
 
 
-						$solicitudes1=buscar_control_estudio($cedula,$conn2,'Cambio');
 						$solicitudes2=buscar_historico($cedula,$conn,'Cambio');
-						if(($solicitudes1==0) && ($solicitudes2==0))
+						if(($solicitudes2==0))
 						{
 							$solicitudes="No tiene";	
 						}
@@ -815,8 +862,7 @@ function ingresar_cambio($demanda,$oferta,$carrera,$conn,$conn2)
 						if($algo==1)
 						{
 							$cant_soli1=cantidad_solicitud_historico($cedula,'Cambio',$conn);
-							$cant_soli2=cantidad_solicitud_control_estudio($cedula,'Cambio',$conn2);
-							if(($cant_soli1+$cant_soli2)==0)
+							if($cant_soli1==0)
 							{
 								$cant_soli=0;	
 							}
@@ -868,17 +914,32 @@ function ingresar_cambio($demanda,$oferta,$carrera,$conn,$conn2)
 					FUNCION PARA EL CALCULO DE LOS PARAMETROS DE LOS TOMADORES DE DECISIONES
 ============================================================================================================================*/
 
-function cargar_datos_estudiante($numero_soli,$cedula,$nivel,$conn2,$conn)
+function cargar_datos_estudiante($proceso,$numero_soli,$cedula,$nivel,$conn2,$conn)
 {	
-	$query="SELECT * FROM solicitudes WHERE ((cedula LIKE '%$cedula%') AND (numero_soli = $numero_soli))";	
-	$result=$conn->Execute($query);
+	if($proceso=='Retiro')
+	{
+		$query="SELECT * FROM solicitudes WHERE ((cedula LIKE '%$cedula%') AND (numero_soli = $numero_soli))";	
+		$result=$conn->Execute($query);
+	}
+	else
+	{
+		if($proceso=='Reingreso')
+		{
+			$query="SELECT * FROM solicitudes_rein WHERE ((cedula LIKE '%$cedula%') AND (numero_soli = $numero_soli))";	
+			$result=$conn->Execute($query);
+		}
+		else
+		{
+			$query="SELECT * FROM solicitudes_cde WHERE ((cedula LIKE '%$cedula%') AND (numero_soli = $numero_soli))";	
+			$result=$conn->Execute($query);
+		}
+	}
 	if($result==false)
 	{
 		echo "error al recuperar 1: ".$conn->ErrorMsg()."<br>" ;
 	}
 	else
 	{
-		$proceso=$result->fields[3];
 		$fecha=$result->fields[4];
 		$razon=$result->fields[2];
 		$exp=$result->fields[5];
@@ -890,9 +951,8 @@ function cargar_datos_estudiante($numero_soli,$cedula,$nivel,$conn2,$conn)
 	else
 	{$aval="No";}
 
-	$solicitudes1=buscar_control_estudio($cedula,$conn2,$proceso);
 	$solicitudes2=buscar_historico($cedula,$conn,$proceso);
-	if(($solicitudes1==0) && ($solicitudes2==0))
+	if(($solicitudes2==0))
 	{
 		$solicitudes="No tiene";	
 	}
@@ -942,8 +1002,7 @@ function cargar_datos_estudiante($numero_soli,$cedula,$nivel,$conn2,$conn)
 	if($algo==1)
 	{
 		$cant_soli1=cantidad_solicitud_historico($cedula,$proceso,$conn);
-		$cant_soli2=cantidad_solicitud_control_estudio($cedula,$proceso,$conn2);
-		if(($cant_soli1+$cant_soli2)==0)
+		if($cant_soli1==0)
 		{
 			$cant_soli=0;	
 		}
@@ -974,7 +1033,7 @@ function cargar_datos_estudiante($numero_soli,$cedula,$nivel,$conn2,$conn)
 
 function mostrar_datos_estudiante_sec($numero_soli,$cedula,$nombre,$apellido,$razon,$promedio,$discapacidad,$nacionalidad,$solicitudes,$proceso,$cant_soli,$fecha)
 {
-	$anio=obtener_anio();
+	$anio=obtener_anio($fecha);
 ?>
         
 	 <form id="Evaluar_estudiante" class="col s12" action="guardar.php" method="POST">
@@ -1084,7 +1143,7 @@ function mostrar_datos_estudiante_sec($numero_soli,$cedula,$nombre,$apellido,$ra
 
 function mostrar_datos_estudiante_coord($aval,$cedula,$nombre,$apellido,$razon,$promedio,$discapacidad,$nacionalidad,$solicitudes,$proceso,$cant_soli,$fecha)
 {
-	$anio=obtener_anio();
+	$anio=obtener_anio($fecha);
 ?>
         
 	 <form id="Evaluar_estudiante" class="col s12" action="resultado.php" method="POST">
@@ -1353,7 +1412,7 @@ function validar_solicitud($numero_soli,$anio,$fecha,$cedula,$razon,$solicitud_a
 				{
 					$periodo=saber_periodo($anio,$fecha,$conn2);
 					$aval="RCC-".$cont.".".$anio.".".$periodo;
-					$query2="UPDATE solicitudes SET exp='$aval' WHERE numero_soli= $numero_soli";
+					$query2="UPDATE solicitudes_rein SET exp='$aval' WHERE numero_soli= $numero_soli";
 					$result=$conn->Execute($query2);
 					if($result==false)
 					{
@@ -1367,7 +1426,7 @@ function validar_solicitud($numero_soli,$anio,$fecha,$cedula,$razon,$solicitud_a
 				else
 				{
 					$aval="0";
-					$query2="UPDATE solicitudes SET exp='$aval' WHERE numero_soli= $numero_soli";
+					$query2="UPDATE solicitudes_rein SET exp='$aval' WHERE numero_soli= $numero_soli";
 					$result=$conn->Execute($query2);
 					if($result==false)
 					{
@@ -1416,41 +1475,7 @@ function validar_solicitud($numero_soli,$anio,$fecha,$cedula,$razon,$solicitud_a
 	return $bandera;
 
 }
-/*===========================================================================================================================
-					FUNCION PARA EL LOGIN DE LOS ESTUDIANTES
-============================================================================================================================
 
-function mostrar($cedula,$nombre,$apellido,$email,$celular,$direccion,$promedio,$discapacidad,$nacionalidad,$solicitudes2,$proceso)
-{
-//trabajar aquí
-	mostrar_datos_estudiante($cedula,$nombre,$apellido,$email,$celular,$direccion,$promedio,$discapacidad,$nacionalidad,$solicitudes2,$proceso);
-}
-=============================================================================================================================
-					FUNCION PARA VER LA CANTIDAD DE SOLICITUDES REALIZADAS POR UN ESTUDIANTE EN LA BD DE CONTROL DE E.
-============================================================================================================================*/
-
-
-function cantidad_solicitud_control_estudio($cedula,$proceso,$conn2)
-{
-	$cont=0;
-	$query="SELECT * FROM solicitudes WHERE ((cedula LIKE '%$cedula%') AND (t_solicitud LIKE '%$proceso%'))";	
-	$result=$conn2->Execute($query);
-	if($result==false)
-	{
-		echo "error al recuperar 5: ".$conn2->ErrorMsg()."<br>" ;
-	}
-	else
-	{
-		while (!$result->EOF)
-		{				
-			$cont++;
-			$result->MoveNext();				
-		}
-			
-	}
-	return $cont;
-	$conn2->Close();
-}
 /*============================================================================================================================
 					FUNCION PARA VER LA CANTIDAD DE SOLICITUDES REALIZADAS POR UN ESTUDIANTE EN LA BD DE MI TESIS
 =============================================================================================================================*/
@@ -1474,44 +1499,6 @@ function cantidad_solicitud_historico($cedula,$proceso,$conn)
 	}
 	return $cont;
 	$conn->Close();
-}
-
-
-/*============================================================================================================================
-					FUNCION PARA VER LA CANTIDAD DE SOLICITUDES REALIZADAS POR UN ESTUDIANTE EN LA BD DE CONTROL DE E
-=========================================================================================================================*/
-
-function buscar_control_estudio($cedula,$conn2,$proceso)
-{
-	
-	$query2="SELECT * FROM solicitudes WHERE (cedula LIKE '%$cedula%') AND t_solicitud LIKE '%$proceso%'";	
-	$result=$conn2->Execute($query2);
-	if($result==false)
-	{echo "error al recuperar 4: ".$conn2->ErrorMsg()."<br>" ;}
-	else
-	{		
-				while(!$result->EOF) 
-				{			
-					for ($i=0, $max=$result->FieldCount(); $i<$max; $i++)
-					{
-						$solicitudes=$result->fields[6];					
-						
-					}
-					if( $solicitudes==$proceso)
-						{
-							$solicitudes1=1;	
-						}
-						else
-						{
-							$solicitudes1=0;	
-												
-						}
-					$result->MoveNext();
-				}
-				
-	}	
-	return $solicitudes1;
-	$conn2->Close();
 }
 
 /*============================================================================================================================
@@ -1632,7 +1619,7 @@ $conn2->Close();
 /*============================================================================================================================
 					FUNCION PARA CALCULA DIFERENCIA ENTRE DOS FECHAS
 ==============================================================================================================================*/
-function date_diff($date1, $date2) 
+function date_diff1($date1, $date2) 
 { 
     $current = $date1; 
     $datetime2 = date_create($date2); 
@@ -1664,16 +1651,19 @@ return $fecha;
 /*============================================================================================================================
 					FUNCIONES PARA SABER QUE DÍA METIO LA SOLICITUD Y SI ESTA A TIEMPO O NO
 ==============================================================================================================================*/
-function obtener_anio()
+function obtener_anio($fecha)
 {
-	date_default_timezone_set("America/Caracas"); 
+	$fecha1=substr($fecha,0,4);
+	return $fecha1;
+
+	/*date_default_timezone_set("America/Caracas"); 
 	$tiempo = getdate(time());	
 	$year = $tiempo['year'];
 	$dia = $tiempo['wday']; 
 	$dia_mes=$tiempo['mday']; 
 	$mes = $tiempo['mon']; 
 	$year = $tiempo['year']; 
-	return $year;
+	return $year;*/
 }
 /*============================================================================================================================
 					FUNCION PARA SABER SI ESTÁ A TIEMPO O NO (RETIRO)
@@ -1708,7 +1698,7 @@ function tiempo_solicitud_retiro($anio,$fecha,$conn2)
 	}
 	else
 	{
-		$cant_dias=date_diff($fecha_fin_ret, $fecha);	
+		$cant_dias=date_diff1($fecha_fin_ret, $fecha);	
 	}
 	return $cant_dias;
 	$conn2->Close();
@@ -1747,7 +1737,7 @@ function tiempo_solicitud_cde($anio,$fecha,$conn2)
 	}
 	else
 	{
-		$cant_dias=date_diff($fecha_fin_cde, $fecha);	
+		$cant_dias=date_diff1($fecha_fin_cde, $fecha);	
 	}
 	return $cant_dias;
 	$conn2->Close();
@@ -1786,7 +1776,7 @@ function tiempo_solicitud_reingreso($anio,$fecha,$conn2)
 	}
 	else
 	{
-		$cant_dias=date_diff($fecha_fin_ret, $fecha);	
+		$cant_dias=date_diff1($fecha_fin_ret, $fecha);	
 	}
 	return $cant_dias;
 	$conn2->Close();
@@ -1833,7 +1823,7 @@ function valida_fecha($inicio, $fin, $validar)
 /*============================================================================================================================
 					FUNCION PARA TOMAR LA DECISION
 ==============================================================================================================================*/
-function DESICION($fecha,$cedula,$razon,$nombre,$apellido,$discapacidad,$promedio,$solicitudes,$solicitud_actual,$aval,$cant_soli,$periodo,$conn,$conn2)
+function DECISION($fecha,$cedula,$razon,$nombre,$apellido,$discapacidad,$promedio,$solicitudes,$solicitud_actual,$aval,$cant_soli,$periodo,$conn,$conn2)
 {		
 	$query="SELECT * FROM razon_proceso WHERE (proceso LIKE '%$solicitud_actual%') AND (razon LIKE '%$razon%')";
 	$result=$conn->Execute($query);
@@ -2337,7 +2327,7 @@ function actualizar_puntaje($proceso,$razon,$puntaje,$fecha,$conn)
  ======================================================================================================================*/
 
 function ingresar_historico($exp,$cedula,$fecha_solicitud,$razon,$promedio,$solicitudes,$solicitud_actual,$aval,$fecha,$medidas,$decision,$observaciones,$acuerdo,$conn,$conn2)
-{	$anio=obtener_anio();
+{	$anio=obtener_anio($fecha_solicitud);
 	if($acuerdo=='No')
 	{
 		if($decision=="Aprobado")
@@ -2514,6 +2504,10 @@ function ingresar_historico($exp,$cedula,$fecha_solicitud,$razon,$promedio,$soli
 
 		}
 
+	}
+	else
+	{
+		$aval1=$exp;
 	}	
 	$query= "INSERT INTO decisiones (cedula, fecha_solicitud, razon, promedio, solicitudes, solicitud_actual, aval, medidas, tiempo_sol, decision, observaciones, acuerdo, exp) VALUES ('$cedula', '$fecha_solicitud', '$razon', '$promedio', '$solicitudes', '$solicitud_actual', '$aval', '$medidas', '$fecha', '$decision', '$observaciones', '$acuerdo', '$aval1')"; 
 	if($conn->Execute($query)==false)
