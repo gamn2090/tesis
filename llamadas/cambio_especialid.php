@@ -17,7 +17,7 @@ $bandera=$_SESSION['bandera'];
   <?php
     if($nivel==$bandera)
     {
-      mostrar_proceso('Cambio',$bandera,$nivel,$conn,$conn2);
+      mostrar_proceso('Cambio',$bandera,$nivel,$conn);
     }
     else
     {  

@@ -101,8 +101,8 @@ session_start();
               $fecha=$_POST['fecha']; 
               $anio=$_POST['anio'];     
             }
-            $periodo=tiempo_solicitud_retiro($anio,$fecha,$conn2);
-            $resultado=DECISION($fecha,$cedula,$razon,$nombre,$apellido,$discapacidad,$promedio,$solicitudes,$solicitud_actual,$aval,$cant_soli,$periodo,$conn,$conn2);
+            $periodo=tiempo_solicitud_retiro($anio,$fecha,$conn);
+            $resultado=DECISION($fecha,$cedula,$razon,$nombre,$apellido,$discapacidad,$promedio,$solicitudes,$solicitud_actual,$aval,$cant_soli,$periodo,$conn);
             
             }
         }

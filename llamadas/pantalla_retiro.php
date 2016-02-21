@@ -128,7 +128,7 @@ else
 		$year = $tiempo['year']; 
 		$fecha=$dia_mes."-".$mes."-".$year;
 		
-		mostrar_datos_para_solicitud($solicitud,$cedula,$fecha,$conn,$conn2);
+		mostrar_datos_para_solicitud($solicitud,$cedula,$fecha,$conn);
 	}
 }
 ?>

@@ -63,7 +63,7 @@ session_start();
 				$cedula=$_GET['id']; 
         $soli=$_GET['soli'];
         $fecha=$_GET['fecha'];						
-				estudiar_decision($fecha,$cedula,$soli,$conn,$conn2);
+				estudiar_decision($fecha,$cedula,$soli,$conn);
 			?>
 		
 		</div>

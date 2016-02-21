@@ -4,15 +4,7 @@ include('../procesos/funciones.php');
 $proceso="Retiro";
 session_start();
 $nivel=$_SESSION['nivel'];
-$bandera=$_SESSION['bandera'];  
-/*if($nivel==$bandera)
-	{
-		mostrar_proceso_coord($proceso,$conn,$conn2);
-	}
-	else
-	{
-		mostrar_proceso_sec($proceso,$conn,$conn2);
-	/*}*/
+$bandera=$_SESSION['bandera']; 
 ?>
 	<!DOCTYPE html>
 <html>

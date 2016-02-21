@@ -2,7 +2,7 @@
 	
 	include('../config.php');
 
-			$query="SELECT * FROM solicitudes WHERE (proceso LIKE '%Retiro%')";
+			$query="SELECT COUNT (exp) AS total_rt FROM decisiones WHERE (exp LIKE 'RT-%')";
 			$result=$conn->Execute($query);			
 			if($result==false)
 			{
@@ -15,21 +15,14 @@
 				{	
 					for ($i=0, $max=$result->FieldCount(); $i<$max; $i++)
 					{							
-						$cedula=$result->fields[0];
-						$numero_sol=$result->fields[1];
-						$razon=$result->fields[2];	
-						$link="<a href=\"/evaluar.php?id=".$cedula."&numero=".$numero_sol."\" target='_blank'>Evaluar</a>";						
+						$cont=$result->fields['total_rt'];				
 						$result->MoveNext();											
 						break;												
 					}
-					$data[$j]=array("cedula"=>$cedula,
-									"numero"=> $numero_sol,
-									"razon"=> $razon,
-									"link"=>$link);
-					$j++;
+					
 					
 				}
 			} 
-				//header('Content-type: application/json');
-				echo json_encode($data);
+			echo $cont;
+				
 ?>

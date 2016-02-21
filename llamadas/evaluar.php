@@ -63,7 +63,7 @@ session_start();
 		$numero_sol=base64_decode($numero_sol);
     $proceso=$_GET['proceso'];
     $proceso=base64_decode($proceso);
-    cargar_datos_estudiante($proceso,$numero_sol,$cedula,$nivel,$conn2,$conn);
+    cargar_datos_estudiante($proceso,$numero_sol,$cedula,$nivel,$conn);
 ?>
 		</div>
     </div>

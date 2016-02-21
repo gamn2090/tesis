@@ -76,7 +76,7 @@ session_start();
 							$anio=$_POST['anio'];		
               $numero_soli=$_POST['numero_soli'];	
 						}
-						$resultado=validar_solicitud($numero_soli,$anio,$fecha,$cedula,$razon,$solicitud_actual,$aval,$conn,$conn2);						
+						$resultado=validar_solicitud($numero_soli,$anio,$fecha,$cedula,$razon,$solicitud_actual,$aval,$conn);						
 					if($resultado==1)
           { 
           ?>    

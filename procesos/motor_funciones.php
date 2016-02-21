@@ -40,8 +40,7 @@
 				session_start();
 				$cedula = $_POST['cedula'];
 				$contraseña = $_POST['contraseña'];
-			//var_dump($conn2); 						
-			loguear($cedula,$contraseña,$conn2);			
+			loguear($cedula,$contraseña,$conn);			
 			}			
 		break;
  		case 'Accesar':/*loguear en la coordinación*/
@@ -58,15 +57,15 @@
  		 		mostrar($cedula,$nombre,$apellido,$email,$celular,$direccion,$promedio,$discapacidad,$nacionalidad,$solicitudes2,$proceso);
  		break;	
  		case 'mostrar_proceso_ret': 				
- 				$array=mostrar_proceso('Retiro',$bandera,$nivel,$conn,$conn2);
+ 				$array=mostrar_proceso('Retiro',$bandera,$nivel,$conn);
  				echo $array;
  		break;	
  		case 'mostrar_proceso_rei':
- 				$array=mostrar_proceso('Reingreso',$bandera,$nivel,$conn,$conn2);
+ 				$array=mostrar_proceso('Reingreso',$bandera,$nivel,$conn);
  				echo $array;
  		break;
  		case 'mostrar_proceso_cde': 
- 				$array=mostrar_proceso('Cambio',$bandera,$nivel,$conn,$conn2);
+ 				$array=mostrar_proceso('Cambio',$bandera,$nivel,$conn);
  				echo $array;			
  		break;
  		case 'mostrar_historico': 
@@ -93,11 +92,11 @@
 					}
 						if($decision=="Indefinida")
 						{
-						$mensaje1=ingresar_historico($exp,$cedula,$fecha_solicitud,$razon,$promedio,$solicitudes,$solicitud_actual,$aval,$fecha,$medidas,$decision2,$observaciones,$acuerdo,$conn,$conn2);
+						$mensaje1=ingresar_historico($exp,$cedula,$fecha_solicitud,$razon,$promedio,$solicitudes,$solicitud_actual,$aval,$fecha,$medidas,$decision2,$observaciones,$acuerdo,$conn);
 						}
 						else
 						{					
-							$mensaje1=ingresar_historico($exp,$cedula,$fecha_solicitud,$razon,$promedio,$solicitudes,$solicitud_actual,$aval,$fecha,$medidas,$decision,$observaciones,$acuerdo,$conn,$conn2);
+							$mensaje1=ingresar_historico($exp,$cedula,$fecha_solicitud,$razon,$promedio,$solicitudes,$solicitud_actual,$aval,$fecha,$medidas,$decision,$observaciones,$acuerdo,$conn);
 						}
 						$mensaje=$exp;
 						header("location: ../llamadas/resultado.php?mensaje=$mensaje");
@@ -158,7 +157,7 @@
 				$demanda=$_POST['demanda'];
 				$carrera=$_POST['carrera'];
 				$oferta=$_POST['oferta'];
-				$mensaje=ingresar_cambio($demanda,$oferta,$carrera,$conn,$conn2);
+				$mensaje=ingresar_cambio($demanda,$oferta,$carrera,$conn);
 				header("location: ../llamadas/resultado.php?mensaje=$mensaje");
 
 		break;
