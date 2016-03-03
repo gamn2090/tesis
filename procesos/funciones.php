@@ -2721,4 +2721,27 @@ function visualizar_antecedentes($razon,$promedio,$solicitudes,$solicitud_actual
 			}
 				$conn->Close();			
 }
+
+function evaluar_reingreso($cedula, $Razon, $fecha, $conn)
+{
+	$query="SELECT COUNT(*) cont FROM notas WHERE ((periodo = 1) OR (periodo = 2)) AND cedula = '".$cedula."';
+	$result = $conn->Execute($query);
+	if($result==false)
+	{
+		echo "error al recuperar: ".$conn->ErrorMsg()."<br>" ;
+	}
+	else
+	{
+		while(!$result->EOF) 
+		{			
+			for ($i=0, $max=$result->FieldCount(); $i<$max; $i++)
+			{
+				$cont=$result->fields[0];
+				$result->MoveNext();											
+				break;	
+			}
+		}
+	}
+}
+
 ?>
