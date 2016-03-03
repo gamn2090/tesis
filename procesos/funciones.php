@@ -2722,7 +2722,7 @@ function visualizar_antecedentes($razon,$promedio,$solicitudes,$solicitud_actual
 				$conn->Close();			
 }
 
-function evaluar_reingreso($cedula, $Razon, $fecha, $conn)
+function evaluar_reingreso($cedula, $razon, $fecha, $conn)
 {
 	$query="SELECT COUNT(*) cont FROM notas WHERE ((periodo = 1) OR (periodo = 2)) AND cedula = '".$cedula."';
 	$result = $conn->Execute($query);
@@ -2742,6 +2742,26 @@ function evaluar_reingreso($cedula, $Razon, $fecha, $conn)
 			}
 		}
 	}
+}
+
+function cargar_solicitudes($proceso,$conn)
+{
+	switch($proceso){
+	case 'retiro':
+		$query="SELECT A.* FROM solicitudes A, solicitudes_ret B
+			WHERE A.fecha <> B.fecha_ingreso AND  A.cedula <> B.cedula ";
+	break;
+	case 'reingreso':
+		$query="SELECT A.* FROM solicitudes A, solicitudes_rein B
+			WHERE A.fecha <> B.fecha_ingreso AND  A.cedula <> B.cedula ";
+	break;
+	case 'cambio':
+		$query="SELECT A.* FROM solicitudes A, solicitudes_cde B
+			WHERE A.fecha <> B.fecha_ingreso AND  A.cedula <> B.cedula ";
+	break;
+	}
+	$result  = $conn->Execute($query);
+	/*armar el array e insertarlo en solicitudes_ret/solicitudes_rein/solicitudes_cde*/
 }
 
 ?>
