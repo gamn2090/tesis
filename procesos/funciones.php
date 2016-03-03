@@ -2724,7 +2724,7 @@ function visualizar_antecedentes($razon,$promedio,$solicitudes,$solicitud_actual
 
 function evaluar_reingreso($cedula, $razon, $fecha, $conn)
 {
-	$query="SELECT COUNT(*) cont FROM notas WHERE ((periodo = 1) OR (periodo = 2)) AND cedula = '".$cedula."';
+	$query="SELECT COUNT(*) cont FROM notas WHERE ((periodo = 1) OR (periodo = 2)) AND cedula = '".$cedula."' ";
 	$result = $conn->Execute($query);
 	if($result==false)
 	{
@@ -2742,6 +2742,25 @@ function evaluar_reingreso($cedula, $razon, $fecha, $conn)
 			}
 		}
 	}
+	$query2="SELECT SUM(substr(A.asignatura,-1)), B.credito_titulo  FROM notas A, esp B WHERE (A.promedio > 4 AND A.cedula = '".$cedula."' AND A.especialidad = B.codigo )";
+	$result2 = $conn->Execute($query2);
+	if($result2==false)
+	{
+		echo "error al recuperar: ".$conn->ErrorMsg()."<br>" ;
+	}
+	else
+	{
+		while(!$result2->EOF) 
+		{			
+			for ($i=0, $max=$result2->FieldCount(); $i<$max; $i++)
+			{
+				$creditos_apro=$result2->fields[0];
+				$result2->MoveNext();											
+				break;	
+			}
+		}
+	}
+	
 }
 
 function cargar_solicitudes($proceso,$conn)
