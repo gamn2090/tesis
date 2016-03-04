@@ -2772,7 +2772,7 @@ function cargar_solicitudes($proceso,$conn)
 	break;
 	case 'reingreso':
 		$query="SELECT A.* FROM solicitudes A, solicitudes_rein B
-			WHERE A.fecha <> B.fecha_ingreso AND  A.cedula <> B.cedula ";
+			WHERE A.fecha <> B.fecha_ingreso AND  A.cedula <> B.cedula";
 	break;
 	case 'cambio':
 		$query="SELECT A.* FROM solicitudes A, solicitudes_cde B
@@ -2781,6 +2781,22 @@ function cargar_solicitudes($proceso,$conn)
 	}
 	$result  = $conn->Execute($query);
 	/*armar el array e insertarlo en solicitudes_ret/solicitudes_rein/solicitudes_cde*/
+	if($result==false)
+	{
+		echo "error al recuperar: ".$conn->ErrorMsg()."<br>" ;
+	}
+	else
+	{
+		while(!$result->EOF) 
+		{			
+			for ($i=0, $max=$result->FieldCount(); $i<$max; $i++)
+			{
+				$creditos_apro=$result->fields[0];
+				$result->MoveNext();											
+				break;	
+			}
+		}
+	}
 }
 
 ?>
