@@ -2742,7 +2742,10 @@ function evaluar_reingreso($cedula, $razon, $fecha, $conn)
 			}
 		}
 	}
-	$query2="SELECT SUM(substr(A.asignatura,-1)), B.credito_titulo  FROM notas A, esp B WHERE (A.promedio > 4 AND A.cedula = '".$cedula."' AND A.especialidad = B.codigo )";
+	$query2="SELECT SUM(to_number(substr((A.asignatura),7,1),'9')) credito, B.credito_titulo from notas as A, esp as B 
+	WHERE (A.nota > '4' AND 
+	A.cedula = '".$cedula."' AND 
+	A.especialidad = B.codigo) GROUP BY B.credito_titulo";
 	$result2 = $conn->Execute($query2);
 	if($result2==false)
 	{
