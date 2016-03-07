@@ -2767,16 +2767,31 @@ function cargar_solicitudes($proceso,$conn)
 {
 	switch($proceso){
 	case 'retiro':
-		$query="SELECT A.* FROM solicitudes A, solicitudes_ret B
-			WHERE A.fecha <> B.fecha_ingreso AND  A.cedula <> B.cedula ";
+		$query="SELECT solicitudes.* FROM solicitudes, solicitudes_ret
+			WHERE (solicitudes.fecha <> solicitudes_ret.fecha_solicitud AND  
+			solicitudes.cedula = solicitudes_ret.cedula AND 
+			solicitudes.estatus = 'aprobado') OR
+			(solicitudes.fecha <> solicitudes_ret.fecha_solicitud AND  
+			solicitudes.cedula <> solicitudes_ret.cedula AND 
+			solicitudes.estatus = 'aprobado') ";
 	break;
 	case 'reingreso':
-		$query="SELECT A.* FROM solicitudes A, solicitudes_rein B
-			WHERE A.fecha <> B.fecha_ingreso AND  A.cedula <> B.cedula";
+		$query="SELECT solicitudes.* FROM solicitudes, solicitudes_rein
+			WHERE (solicitudes.fecha <> solicitudes_rein.fecha_solicitud AND  
+			solicitudes.cedula = solicitudes_rein.cedula AND 
+			solicitudes.estatus = 'aprobado') OR
+			(solicitudes.fecha <> solicitudes_rein.fecha_solicitud AND  
+			solicitudes.cedula <> solicitudes_rein.cedula AND 
+			solicitudes.estatus = 'aprobado')";
 	break;
 	case 'cambio':
-		$query="SELECT A.* FROM solicitudes A, solicitudes_cde B
-			WHERE A.fecha <> B.fecha_ingreso AND  A.cedula <> B.cedula ";
+		$query="SELECT solicitudes.* FROM solicitudes, solicitudes_cde
+			WHERE (solicitudes.fecha <> solicitudes_cde.fecha_solicitud AND  
+			solicitudes.cedula = solicitudes_cde.cedula AND 
+			solicitudes.estatus = 'aprobado') OR
+			(solicitudes.fecha <> solicitudes_cde.fecha_solicitud AND  
+			solicitudes.cedula <> solicitudes_cde.cedula AND 
+			solicitudes.estatus = 'aprobado')";
 	break;
 	}
 	$result  = $conn->Execute($query);
