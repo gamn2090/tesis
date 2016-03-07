@@ -119,7 +119,7 @@ else
 	else
 	{	
 		
-		$solicitud='Retiro';		
+		$solicitud='Reingreso';		
 		date_default_timezone_set("America/Caracas" ) ; 
 		$tiempo = getdate(time()); 
 		$dia = $tiempo['wday']; 

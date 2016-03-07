@@ -7,9 +7,9 @@
 <meta http-equiv="content-type" content="text/html; charset=utf-8">
 <meta name="keywords" content="siceudo">
 <link rel="stylesheet" href="css/main.css">
-<link rel="icon" type="image/x-icon" href="imagenes/logo.ico">
-<link href="css/estilos.css" rel="stylesheet" type="text/css">
-<link href="css/estilos_simplemodal.css" rel="stylesheet" type="text/css">
+<link rel="icon" type="image/x-icon" href="../imagenes/logo.ico">
+<link href="../css/estilos.css" rel="stylesheet" type="text/css">
+<link href="../css/estilos_simplemodal.css" rel="stylesheet" type="text/css">
 <link type="text/css" rel="stylesheet" media="all" href="include/jscalendar/calendar-blue.css" title="win2k-cold-1">
 <script type="text/javascript" src="include/jquery/jquery.js"></script>
 <script type="text/javascript" src="include/jquery/jquery-1.4.2.min.js"></script>
@@ -56,17 +56,17 @@
 	}
 </script>
 <?php
-include ("procesos/funciones.php");
-	include ("config.php");
+include ("../procesos/funciones.php");
+	include ("../config.php");
 ?>
 </head>
 <body onLoad="set_interval()" onmousemove="reset_interval()" onclick="reset_interval()" onkeypress="reset_interval()" onscroll="reset_interval()">
 <table width="100%" cellpadding="0" cellspacing="0" border="0">
 	<tbody><tr class="titulo">
 		<td colspan="4" class="tBlanco">
-        	<img src="img/logoHeader.png" alt=""></td>
+        	<img src="../img/logoHeader.png" alt=""></td>
         <td class="tBlanco" align="left">
-        <img border="0" src="img/siceudo.png" style="cursor: pointer"></td>
+        <img border="0" src="../img/siceudo.png" style="cursor: pointer"></td>
 	</tr>
     <tr bgcolor="#005082" class="tBlanco" height="18px">
     	<td colspan="2">&nbsp;&nbsp;&nbsp;&nbsp;.: Bienvenidos :.</td>
@@ -82,8 +82,8 @@ include ("procesos/funciones.php");
 		<ul class="sidemenu">
 			<li><a style="cursor: pointer" href="seleccion_proceso.php">Inicio</a></li>
 			<li><a style="cursor: pointer" href="pantalla_retiro.php">Ingresar Retiro</a></li>
-			<li><a style="cursor: pointer" onClick="cambiar_cuerpo('inicio.php', 'cuerpo')">Ingresar Reingreso</a></li>
-			<li><a style="cursor: pointer" onClick="cambiar_cuerpo('inicio.php', 'cuerpo')">Ingresar Cambio de especialidad</a></li>
+			<li><a style="cursor: pointer" href="pantalla_reingreso.php">Ingresar Reingreso</a></li>
+			<li><a style="cursor: pointer" href="pantalla_cde.php">Ingresar Cambio de especialidad</a></li>
 			<!--<li><a style="cursor: pointer" onclick="cambiar_cuerpo('web/administracion.php', 'cuerpo')">Administración</a></li>
 			<li><a style="cursor: pointer" onclick="cambiar_cuerpo('web/pagina2.php', 'cuerpo')">Link 2</a></li>
 			<li><a style="cursor: pointer" onclick="cambiar_cuerpo('web/pagina3.php', 'cuerpo')">Link 3</a></li>
@@ -136,7 +136,7 @@ else
 </marquee>
 <table width="100%" align="center" cellpadding="0" cellspacing="0" border="0">
 	<tbody><tr>
-		<td width="75"><img src="imagenes/information.png" border="0" width="55" height="55"></td>
+		<td width="75"><img src="../img/information.png" border="0" width="55" height="55"></td>
         <td><p align="justify" style="line-height : 20px;">Para realizar cualquier solicitud, debes tener tus datos actualizados. 
           <strong><!--<a href="http://inscripciones.sucre.udo.edu.ve" target="_blank">--><!--<h2>inscripciones.sucre.udo.edu.ve</h2>--><!--</a>--></strong><br>
 		  Puedes hacerlo aqui en la opción<strong> Actualizar Datos</strong>.</p>
@@ -245,7 +245,7 @@ else
 »&nbsp;<a onClick="cambiar_cuerpo('descargas/manuales.php', 'descargas')" style="cursor: pointer;">Manuales</a><br>
  <br>
 Para un mejor funcionamiento Descarga
-<a href="https://download.mozilla.org/?product=firefox-stub&amp;os=win&amp;lang=es-ES" target="_blank"><img src="img/mozillaWeb.jpg" border="0" style="cursor:pointer"></a>
+<a href="https://download.mozilla.org/?product=firefox-stub&amp;os=win&amp;lang=es-ES" target="_blank"><img src="../img/mozillaWeb.jpg" border="0" style="cursor:pointer"></a>
 </div>
 
 				<br>

@@ -35,7 +35,7 @@
 <script type="text/javascript" src="solicitudes/script/scriptReingPre.js?v=70180"></script> 
 <script type="text/javascript" src="consultas/script/scriptConsultaPros.js?v=70180"></script>
 <script language="javascript">
-	var timer = 0;
+	/*var timer = 0;
 	function set_interval() {
 		timer = setInterval("auto_logout()",600000);
 	}
@@ -48,7 +48,7 @@
 	}
 	function auto_logout() {
 		window.location = "logout.php";
-	}
+	}*/
 </script>
 </head>
 <body onLoad="set_interval()" onmousemove="reset_interval()" onclick="reset_interval()" onkeypress="reset_interval()" onscroll="reset_interval()">

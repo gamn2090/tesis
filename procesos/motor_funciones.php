@@ -161,6 +161,14 @@
 				header("location: ../llamadas/resultado.php?mensaje=$mensaje");
 
 		break;
+		case 'mostrar_valor_ret': 				
+ 				$array=mostrar_puntaje('Retiro',$conn);
+ 				echo $array;
+ 		break;			
+		case 'mostrar_valor_cde': 				
+ 				$array=mostrar_puntaje('Cambio',$conn);
+ 				echo $array;
+ 		break;	
 
 		}//fin switch	
 	}//fin isset[$_post[accion]]
