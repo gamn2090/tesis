@@ -1575,27 +1575,68 @@ function mostrar_datos_para_solicitud($solicitud,$cedula,$fecha,$conn)
 			{
 				$cedula=$result->fields[1];
 				$nombre=$result->fields[3];
-				$apellido=$result->fields[2];				
+				$apellido=$result->fields[2];
+				$nucleo=$result->fields['nucleo'];					
 			
 			}								
 			$result->MoveNext();
 		}
 	}
+	$query="SELECT especialidad FROM est_esp WHERE ced LIKE '%$cedula%'";
+	$result=$conn->Execute($query);
+	if($result==false)
+	{echo "error al recuperar: ".$conn->ErrorMsg()."<br>" ;}
+	else
+	{	
+		while(!$result->EOF) 
+		{			
+			for ($i=0, $max=$result->FieldCount(); $i<$max; $i++)
+			{
+				$especialidad=$result->fields['especialidad'];					
+			}								
+			$result->MoveNext();
+		}
+	}
+	$query1="SELECT per, ano FROM periodo WHERE '".$fecha."' BETWEEN f_inicio AND f_final ";
+	$result=$conn->Execute($query1);
+	if($result==false)
+	{echo "error al recuperar: ".$conn->ErrorMsg()."<br>" ;}
+	else
+	{	
+		while(!$result->EOF) 
+		{			
+			for ($i=0, $max=$result->FieldCount(); $i<$max; $i++)
+			{
+				$periodo=$result->fields['per'];
+				$anio=$result->fields['ano'];					
+			}								
+			$result->MoveNext();
+		}
+	}
+	$estatus="Recibido";
 ?>	
-	<form class="cbp-mc-form" id="Evaluar_estudiante" action="seleccion_opciones.php" method="POST">
+	<form class="cbp-mc-form" name="Evaluar_estudiante" id="Evaluar_estudiante" action="motor_funciones.php" method="POST">
         <div class="cbp-mc-column">
-        <input type="hidden" id="proceso" name="proceso" value="<?php echo $solicitud ?>">
+         <!-- Inputs hiddens -->
+        <input type="hidden" id="periodo" name="periodo" value="<?php echo $periodo ?>">
+        <input type="hidden" id="anio" name="anio" value="<?php echo $anio ?>">
+		<input type="hidden" id="especialidad" name="especialidad" value="<?php echo $especialidad ?>">
+        <input type="hidden" id="nucleo" name="nucleo" value="<?php echo $nucleo ?>">
+        <input type="hidden" id="solicitud" name="solicitud" value="<?php echo $solicitud ?>">
+        <input type="hidden" id="estatus" name="estatus" value="<?php echo $estatus ?>">        
         <input type="hidden" id="fecha" name="fecha" value="<?php echo $fecha ?>">
+        <input type="hidden" id="Nombre" name="Nombre"  value="<?php echo $nombre; ?>">
+        <input type="hidden" id="Apellido" name="Apellido"  value="<?php echo $apellido; ?>">
+        <input type="hidden" id="cedula" name="cedula"  value="<?php echo $cedula; ?>">
+        <!-- Inputs hiddens -->
+
         <label for="Nombre">Nombre</label>
         <input type="text" id="Nombre"  disabled value="<?php echo $nombre; ?>">
-        <input type="hidden" id="Nombre" name="Nombre"  value="<?php echo $nombre; ?>">
         <label for="Apellido">Apellido</label>
         <input type="text" id="Apellido"  disabled value="<?php echo $apellido; ?>">
-        <input type="hidden" id="Apellido" name="Apellido"  value="<?php echo $apellido; ?>">
         <label for="cedula">Cedula</label>
         <input type="text" id="cedula" disabled value="<?php echo $cedula; ?>">
-        <input type="hidden" id="cedula" name="cedula"  value="<?php echo $cedula; ?>">
-        <?php if($solicitud=='Retiro' || $solicitud=='Cambio' ){ ?>
+        <?php if($solicitud=='Retiro'){ ?>
         
         
         <label>Razón</label>
