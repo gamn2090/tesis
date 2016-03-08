@@ -1582,7 +1582,7 @@ function mostrar_datos_para_solicitud($solicitud,$cedula,$fecha,$conn)
 			$result->MoveNext();
 		}
 	}
-	$query="SELECT especialidad FROM est_esp WHERE ced LIKE '%$cedula%'";
+	$query="SELECT especialidad FROM est_esp WHERE cedula LIKE '%$cedula%'";
 	$result=$conn->Execute($query);
 	if($result==false)
 	{echo "error al recuperar: ".$conn->ErrorMsg()."<br>" ;}
@@ -1615,7 +1615,7 @@ function mostrar_datos_para_solicitud($solicitud,$cedula,$fecha,$conn)
 	}
 	$estatus="Recibido";
 ?>	
-	<form class="cbp-mc-form" name="Evaluar_estudiante" id="Evaluar_estudiante" action="motor_funciones.php" method="POST">
+	<form class="cbp-mc-form" name="Evaluar_estudiante" id="Evaluar_estudiante" action="../procesos/motor_funciones.php" method="POST">
         <div class="cbp-mc-column">
          <!-- Inputs hiddens -->
         <input type="hidden" id="periodo" name="periodo" value="<?php echo $periodo ?>">
@@ -1696,7 +1696,7 @@ function mostrar_datos_para_solicitud($solicitud,$cedula,$fecha,$conn)
         </select>  
          <?php }?>     
          <div class="cbp-mc-submit-wrap"><input class="cbp-mc-submit" type="submit" 
-        value="Aceptar" /></div>
+        value="Evaluar estudiante" /></div>
         
 
        </div>      

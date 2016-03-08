@@ -170,7 +170,7 @@
  				$array=mostrar_puntaje('Cambio',$conn);
  				echo $array;
  		break;	
-		case 'Evaluar_estudiante': 				
+		case 'Evaluar estudiante': 				
  				$cedula=$_POST['cedula'];
 				$proceso=$_POST['solicitud'];
 				$fecha=$_POST['fecha'];
