@@ -3,15 +3,49 @@
 // include ("../pantalla_retiro.php");
 
 
+/*function ingresar_solicitud($cedula,$proceso,$fecha,$razon,$periodo,$anio,$especialidad,$nucleo,$estatus,$asignatura,$conn)
+{
+	if($proceso=='Retiro')
+	{	
+		$query= "INSERT INTO solicitudes (cedula, nucleo, especialidad, fecha, anio, periodo, t_solicitud, recaudos, estatus, observacion) 
+				VALUES ('$cedula', '$nucleo', '$especialidad', '$fecha', '$anio', '$periodo', '$proceso', 'NO', '$estatus', '$razon' )";
+	}
+	else
+	{
+		if($proceso=='Reingreso')
+		{	
+			$query= "INSERT INTO solicitudes (cedula, nucleo, especialidad, fecha, anio, periodo, t_solicitud, recaudos, estatus, observacion) 
+					VALUES ('$cedula', '$nucleo', '$especialidad', '$fecha', '$anio', '$periodo', '$proceso', 'NO', '$estatus', 'ninguna' )";
+		}
+		else
+		{
+			if($proceso=='Cambio')
+			{	
+				$query= "INSERT INTO solicitudes (cedula, nucleo, especialidad, fecha, anio, periodo, t_solicitud, recaudos, estatus, observacion) 
+						VALUES ('$cedula', '$nucleo', '$especialidad', '$fecha', '$anio', '$periodo', '$proceso', 'NO', '$estatus', '$asignatura' )";
+			}	
+		}
+	}
+	$result=$conn->Execute($query);
+	if($result==false)
+	{$bandera=1;}
+	else
+	{$bandera=0;}
+	return $bandera;	
+	$conn->Close();
+}
+
+
+
 /*===========================================================================================================================
 					FUNCION PARA ALMACENAR LOS RETIROS/REINGRESOS REALIZADOS POR LOS ESTUDIANTES
 ============================================================================================================================*/
-
+/*
 function Ingresar_solicitud($cedula,$razon,$proceso,$fecha,$conn)
 {	
 	if($proceso=='Retiro')
 	{	
-		$query= "INSERT INTO solicitudes_ret (cedula, razon, proceso, fecha_solicitud) 
+		$query= "INSERT INTO solicitudes (cedula, razon, proceso, fecha_solicitud) 
 				VALUES ('$cedula', '$razon', '$proceso', '$fecha')";
 	}
 	else
@@ -34,7 +68,7 @@ function Ingresar_solicitud($cedula,$razon,$proceso,$fecha,$conn)
 /*===========================================================================================================================
 					FUNCION PARA ALMACENAR LOS CAMBIOS DE ESPECIALIDAD REALIZADOS POR LOS ESTUDIANTES
 ============================================================================================================================*/
-function ingresar_CDE($cedula,$razon,$carrera_pedida,$fecha,$conn)
+function ingresar_CDE($cedula,$carrera_pedida,$fecha,$conn)
 {
 		$query="SELECT * FROM est_esp WHERE  (cedula LIKE '%$cedula%')";
 		$result=$conn->Execute($query);
@@ -66,7 +100,7 @@ function ingresar_CDE($cedula,$razon,$carrera_pedida,$fecha,$conn)
 				$result->MoveNext();							
 			}		
 		}
-	$query3="INSERT INTO solicitud_CDE (cedula, razon, especialidad_esta_estudiando,especialidad_quiere_estudiar, fecha_solicitud) VALUES ('$cedula', '$razon', '$carrera_actual','%$carrera_pedida%','$fecha')";;
+	$query3="INSERT INTO solicitud_CDE (cedula, especialidad_esta_estudiando,especialidad_quiere_estudiar, fecha_solicitud) VALUES ('$cedula',  '$carrera_actual','%$carrera_pedida%','$fecha')";;
 	if($conn->Execute($query)==false)
 	{$bandera=1;}
 	else
@@ -81,10 +115,10 @@ function ingresar_CDE($cedula,$razon,$carrera_pedida,$fecha,$conn)
 
 function loguear($cedula,$contraseña,$conn)
 {	//$contraseña=sha1(md5($contraseña));	
-	$query="SELECT password FROM login WHERE ((password LIKE '%$contraseña%') AND (cedula LIKE '%$cedula%'))";
+	$query="SELECT password FROM login WHERE password = '$contraseña' AND cedula = '$cedula'";
 	$result=$conn->Execute($query);
 	if($result==false)
-	{echo "error al insertar: ".$conn->ErrorMsg()."<br>" ;}
+	{echo "error al loguear: ".$conn->ErrorMsg()."<br>" ;}
 	else
 	{	
 		while (!$result->EOF) 
@@ -1568,27 +1602,70 @@ function mostrar_datos_para_solicitud($solicitud,$cedula,$fecha,$conn)
 			{
 				$cedula=$result->fields[1];
 				$nombre=$result->fields[3];
-				$apellido=$result->fields[2];				
+				$apellido=$result->fields[2];
+				$nucleo=$result->fields['nucleo'];				
 			
 			}								
 			$result->MoveNext();
 		}
 	}
+	$query="SELECT especialidad FROM est_esp WHERE ced LIKE '%$cedula%'";
+	$result=$conn->Execute($query);
+	if($result==false)
+	{echo "error al recuperar: ".$conn->ErrorMsg()."<br>" ;}
+	else
+	{	
+		while(!$result->EOF) 
+		{			
+			for ($i=0, $max=$result->FieldCount(); $i<$max; $i++)
+			{
+				$especialidad=$result->fields['especialidad'];					
+			}								
+			$result->MoveNext();
+		}
+	}
+	$query1="SELECT per, ano FROM periodo WHERE '".$fecha."' BETWEEN f_inicio AND f_final ";
+	$result=$conn->Execute($query1);
+	if($result==false)
+	{echo "error al recuperar: ".$conn->ErrorMsg()."<br>" ;}
+	else
+	{	
+		while(!$result->EOF) 
+		{			
+			for ($i=0, $max=$result->FieldCount(); $i<$max; $i++)
+			{
+				$periodo=$result->fields['per'];
+				$anio=$result->fields['ano'];					
+			}								
+			$result->MoveNext();
+		}
+	}
+	$estatus="Recibido";
+	
 ?>	
-	<form class="cbp-mc-form" id="Evaluar_estudiante" action="seleccion_opciones.php" method="POST">
+	<form class="cbp-mc-form" name="Evaluar_estudiante" id="Evaluar_estudiante" action="motor_funciones.php" method="POST">
         <div class="cbp-mc-column">
-        <input type="hidden" id="proceso" name="proceso" value="<?php echo $solicitud ?>">
+        <!-- Inputs hiddens -->
+        <input type="hidden" id="periodo" name="periodo" value="<?php echo $periodo ?>">
+        <input type="hidden" id="anio" name="anio" value="<?php echo $anio ?>">
+		<input type="hidden" id="especialidad" name="especialidad" value="<?php echo $especialidad ?>">
+        <input type="hidden" id="nucleo" name="nucleo" value="<?php echo $nucleo ?>">
+        <input type="hidden" id="solicitud" name="solicitud" value="<?php echo $solicitud ?>">
+        <input type="hidden" id="estatus" name="estatus" value="<?php echo $estatus ?>">        
         <input type="hidden" id="fecha" name="fecha" value="<?php echo $fecha ?>">
+        <input type="hidden" id="Nombre" name="Nombre"  value="<?php echo $nombre; ?>">
+        <input type="hidden" id="Apellido" name="Apellido"  value="<?php echo $apellido; ?>">
+        <input type="hidden" id="cedula" name="cedula"  value="<?php echo $cedula; ?>">
+        <!-- Inputs hiddens -->
+
+        
         <label for="Nombre">Nombre</label>
         <input type="text" id="Nombre"  disabled value="<?php echo $nombre; ?>">
-        <input type="hidden" id="Nombre" name="Nombre"  value="<?php echo $nombre; ?>">
         <label for="Apellido">Apellido</label>
         <input type="text" id="Apellido"  disabled value="<?php echo $apellido; ?>">
-        <input type="hidden" id="Apellido" name="Apellido"  value="<?php echo $apellido; ?>">
         <label for="cedula">Cedula</label>
         <input type="text" id="cedula" disabled value="<?php echo $cedula; ?>">
-        <input type="hidden" id="cedula" name="cedula"  value="<?php echo $cedula; ?>">
-        <?php if($solicitud=='Retiro' || $solicitud=='Cambio' ){ ?>
+        <?php if($solicitud=='Retiro' ){ ?>
         
         
         <label>Razón</label>
@@ -1604,18 +1681,15 @@ function mostrar_datos_para_solicitud($solicitud,$cedula,$fecha,$conn)
 					{			
 						for ($i=0, $max=$result->FieldCount(); $i<$max; $i++)
 						{
-							$razon=$result->fields[1];					
-							
+							$razon=$result->fields[1];	
 						}	
 						?>
                         <option><?php echo $razon; ?> </option>
                         <?php					
 						$result->MoveNext();
 					}
-			}
-		
-		?>
-        
+			}		
+		?>        
         </select>
         <?php }?>
         <?php if($solicitud=='Cambio' ){ ?>
@@ -2752,7 +2826,7 @@ function visualizar_antecedentes($razon,$promedio,$solicitudes,$solicitud_actual
 
 function evaluar_reingreso($cedula, $razon, $fecha, $conn)
 {
-	$query="SELECT COUNT(*) cont FROM notas WHERE ((periodo = 1) OR (periodo = 2)) AND cedula = '".$cedula."' ";
+	$query="SELECT COUNT(*) cont FROM notas WHERE ((per = '1') OR (per = '2')) AND cedula = '".$cedula."' ";
 	$result = $conn->Execute($query);
 	if($result==false)
 	{
@@ -2770,7 +2844,7 @@ function evaluar_reingreso($cedula, $razon, $fecha, $conn)
 			}
 		}
 	}
-	$query2="SELECT SUM(to_number(substr((A.asignatura),7,1),'9')) credito, B.credito_titulo from notas as A, esp as B 
+	$query2="SELECT SUM(to_number(substr((A.asignatura),7,1),'9')) credito, B.credito_titulo total_credito from notas as A, esp as B 
 	WHERE (A.nota > '4' AND 
 	A.cedula = '".$cedula."' AND 
 	A.especialidad = B.codigo) GROUP BY B.credito_titulo";
@@ -2794,6 +2868,27 @@ function evaluar_reingreso($cedula, $razon, $fecha, $conn)
 	
 }
 
+/*=================================================================================================================================
+					SABER QUE ESTUDIA UN ESTUDIANTE
+==================================================================================================================================*/
+
+function buscar_carrera($cedula,$conn)
+{
+	$query="SELECT especialidad FROM est_esp where cedula='".$cedula."'";
+	$result=$conn->Execute($query);
+	if($result==false)
+	{
+		echo "error al recuperar: ".$conn->ErrorMsg()."<br>" ;
+	}
+	else
+	{	
+		return $result;
+	}
+}
+
+/*===================================================================================================================================
+								FUNCION PARA LA CARGA DE SOLICITUDES DE LA TABLA SOLICITUD A LAS DE LA TESIS
+===================================================================================================================================*/
 function cargar_solicitudes($proceso,$conn)
 {
 	switch($proceso){
@@ -2822,27 +2917,64 @@ function cargar_solicitudes($proceso,$conn)
 			solicitudes.estatus = 'aprobado') OR
 			(solicitudes.fecha <> solicitudes_cde.fecha_solicitud AND  
 			solicitudes.cedula <> solicitudes_cde.cedula AND 
-			solicitudes.estatus = 'aprobado')";
+			solicitudes.estatus = 'aprobado')";			
 	break;
 	}
 	$result  = $conn->Execute($query);
-	/*armar el array e insertarlo en solicitudes_ret/solicitudes_rein/solicitudes_cde*/
 	if($result==false)
 	{
 		echo "error al recuperar: ".$conn->ErrorMsg()."<br>" ;
 	}
 	else
-	{
-		while(!$result->EOF) 
-		{			
-			for ($i=0, $max=$result->FieldCount(); $i<$max; $i++)
-			{
-				$creditos_apro=$result->fields[0];
-				$result->MoveNext();											
-				break;	
-			}
+	{	
+		if($proceso=='Retiro')
+		{
+			while(!$result->EOF) 
+				{			
+					for ($i=0, $max=$result->FieldCount(); $i<$max; $i++)
+					{				
+						$cedula=$result->fields['cedula'];
+						$razon=$result->fields['observacion'];
+						$fecha_sol=$result->fields['fecha'];
+						$exp='-1';
+						$proceso='Retiro';
+						$result->MoveNext();											
+						break;	
+					}
+				}	
 		}
+		if($proceso=='Reingreso')
+		{							
+				while(!$result->EOF) 
+				{			
+					for ($i=0, $max=$result->FieldCount(); $i<$max; $i++)
+					{		
+						$cedula=$result->fields['cedula'];
+						$fecha_sol=$result->fields['fecha'];
+						$cedula='-1';
+						$proceso='Reingreso';
+						$result->MoveNext();											
+						break;	
+					}
+				}
+		}			
+		if($proceso=='Cambio')
+		{
+				while(!$result->EOF) 
+				{			
+					for ($i=0, $max=$result->FieldCount(); $i<$max; $i++)
+					{
+						$cedula=$result->fields['cedula'];
+						$carrera_pedi=$result->fields['observacion'];
+						$fecha_sol=$result->fields['fecha'];
+						$exp='-1';
+						$result->MoveNext();											
+						break;	
+					}						
+				}
+				$carrera_act=buscar_carrera($cedula,$conn);		
+		}		
 	}
 }
-
+$conn->Close();
 ?>

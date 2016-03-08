@@ -169,6 +169,19 @@
  				$array=mostrar_puntaje('Cambio',$conn);
  				echo $array;
  		break;	
+		case 'Evaluar_estudiante': 				
+ 				$cedula=$_POST['cedula'];
+				$proceso=$_POST['solicitud'];
+				$fecha=$_POST['fecha'];
+				$razon=$_POST['razon'];
+				$periodo=$_POST['periodo'];
+				$anio=$_POST['anio'];
+				$especialidad=$_POST['especialidad'];
+				$nucleo=$_POST['nucleo'];
+				$estatus=$_POST['estatus'];
+				$asignatura=$_POST['asignatura'];
+			   ingresar_solicitud($cedula,$proceso,$fecha,$razon,$periodo,$anio,$especialidad,$nucleo,$estatus,$asignatura,$conn);
+ 		break;
 
 		}//fin switch	
 	}//fin isset[$_post[accion]]
