@@ -56,6 +56,8 @@ function Ingresar_solicitud($cedula,$razon,$proceso,$fecha,$conn)
 				VALUES ('$cedula', '$proceso', '$fecha')";
 		}
 	}
+{		
+	$query= "INSERT INTO solicitudes_ret (cedula, razon, proceso, fecha_solicitud) VALUES ('$cedula', '$razon', '$proceso', '$fecha')";
  //$conn->Execute($query);
  //$ejecutar=$conn->Execute($query); 
 	if($conn->Execute($query)==false)
@@ -1588,7 +1590,7 @@ function buscar_historico($cedula,$conn,$proceso)
 					FUNCION PARA VER LOS DATOS DEL ESTUDIANTE MIENTRAS SOLICITA ALGO
 ==============================================================================================================================*/
 
-function mostrar_datos_para_solicitud($solicitud,$cedula,$fecha,$conn)
+function mostrar_datos_para_solicitud($solicitud,$cedula,$fecha,$conn,$conn)
 {
 	$query2="SELECT * FROM estudiante WHERE ced LIKE '%$cedula%'";
 	$result=$conn->Execute($query2);
@@ -1665,7 +1667,12 @@ function mostrar_datos_para_solicitud($solicitud,$cedula,$fecha,$conn)
         <input type="text" id="Apellido"  disabled value="<?php echo $apellido; ?>">
         <label for="cedula">Cedula</label>
         <input type="text" id="cedula" disabled value="<?php echo $cedula; ?>">
+<<<<<<< HEAD
         <?php if($solicitud=='Retiro' ){ ?>
+=======
+        <input type="hidden" id="cedula" name="cedula"  value="<?php echo $cedula; ?>">
+        
+>>>>>>> parent of b947a61... razones con datatable, login estudiante
         
         
         <label>Razón</label>
@@ -1688,39 +1695,15 @@ function mostrar_datos_para_solicitud($solicitud,$cedula,$fecha,$conn)
                         <?php					
 						$result->MoveNext();
 					}
+
 			}		
 		?>        
-        </select>
-        <?php }?>
-        <?php if($solicitud=='Cambio' ){ ?>
 
-         <label>Asignatura a optar</label>
-        <select id="asignatura" name="asignatura">
-        <?php 
-			$query="SELECT * FROM esp";	
-			$result=$conn->Execute($query);
-			if($result==false)
-			{echo "error al recuperar: ".$conn->ErrorMsg()."<br>" ;}
-			else
-			{	
-				while(!$result->EOF) 
-					{			
-						for ($i=0, $max=$result->FieldCount(); $i<$max; $i++)
-						{
-							$asignatura=$result->fields['nombre'];					
-							
-						}	
-						?>
-                        <option><?php echo $asignatura; ?> </option>
-                        <?php					
-						$result->MoveNext();
-					}
 			}
-		
 		?>
         
-        </select>  
-         <?php }?>     
+
+        </select>
          <div class="cbp-mc-submit-wrap"><input class="cbp-mc-submit" type="submit" 
         value="Aceptar" /></div>
         
@@ -2284,7 +2267,7 @@ FUNCION PARA INGRESAR NUEVAS RAZONES
 ======================================================================================================================*/
 function ingresar_razon($proceso,$razon,$puntaje,$porcentaje,$fecha,$conn)
 {
-	$query="INSERT INTO razon_proceso (proceso, razon, puntaje, fecha) VALUES ('$proceso', '$razon', '$puntaje', '$fecha')";	
+	$query="INSERT INTO razon_proceso (proceso, razon, puntaje, porcentaje, fecha) VALUES ('$proceso', '$razon', '$puntaje', '$porcentaje', '$fecha')";	
 	$result=$conn->Execute($query);
 	if($result==false)
 	{
@@ -2312,31 +2295,46 @@ function mostrar_puntaje($proceso,$conn)
 		echo "error al recuperar: ".$conn->ErrorMsg()."<br>" ;
 	}
 	else
-	{		
-		$j=0;
+	{	
+	 
+		?>
+            <table class="bordered" border="1" cellspacing=25 cellpadding=2 style="font-size: 10pt">
+            <tr>
+            <td><font face="verdana"><b>proceso</b></font></td>
+            <td><font face="verdana"><b>razon</b></font></td>
+            <td><font face="verdana"><b>puntaje</b></font></td>			
+            <td><font face="verdana"><b>      </b></font></td>	
+            </tr>
+            <?php
+			
+					
 		while(!$result->EOF) 
-		{	
+		{			
 			for ($i=0, $max=$result->FieldCount(); $i<$max; $i++)
-			{	
-				$proceso=$result->fields['proceso'];						
-				$razon=$result->fields['razon'];
-				$puntaje=$result->fields['puntaje'];							
-				$puntaje2=base64_encode($puntaje);
-				$razon2=base64_encode($razon);
-				$proceso2=base64_encode($proceso);
-				$link="<a href=\"cambio_valores.php?proceso=".$proceso2."&razon=".$razon2."&puntaje=".$puntaje2."\" target='_blank'>Evaluar</a>";						
-				$result->MoveNext();											
-				break;												
+			{
+					
+					$proceso=$result->fields[0];
+					$razon=$result->fields[1];
+					$puntaje=$result->fields[2];	
+					$proceso2=base64_encode ($proceso);
+					$razon2=base64_encode ($razon);	
+					$puntaje2=base64_encode ($puntaje);	
+																					
+						echo "<tr><td width=\"200\"><font face=\"verdana\">" .$proceso  . "</font></td>";					
+						echo "<td width=\"200\"><font face=\"verdana\">" .$razon. "</font></td>";
+						echo "<td width=\"200\"><font face=\"verdana\">" .$puntaje . "</font></td>";
+						echo "<td width=\"200\"><font face=\"verdana\"><a href=\"cambio_valores.php?proceso=".$proceso2."&razon=".$razon2."&puntaje=".$puntaje2."\" target='_blank'>Evaluar</a></p>"; "</font></td></tr>";							  
+			break;
 			}
-			$data[$j]=array("proceso"=>$proceso,
-							"razon"=> $razon,
-							"puntaje"=> $puntaje,
-							"opcion"=>$link);
-			$j++;
-		} 
-		header('Content-type: application/json');
-		return json_encode($data);
-	}
+			$result->MoveNext();
+
+						
+		}
+	  
+		?>
+        </table>
+        <?php
+	}	
 	$conn->Close();
 }
 /*============================================================================================================================	
@@ -2823,7 +2821,7 @@ function visualizar_antecedentes($razon,$promedio,$solicitudes,$solicitud_actual
 			}
 				$conn->Close();			
 }
-
+/*
 function evaluar_reingreso($cedula, $razon, $fecha, $conn)
 {
 	$query="SELECT COUNT(*) cont FROM notas WHERE ((per = '1') OR (per = '2')) AND cedula = '".$cedula."' ";
@@ -2975,6 +2973,7 @@ function cargar_solicitudes($proceso,$conn)
 				$carrera_act=buscar_carrera($cedula,$conn);		
 		}		
 	}
+	$conn->Close();
 }
-$conn->Close();
 ?>
+

@@ -161,6 +161,7 @@
 				header("location: ../llamadas/resultado.php?mensaje=$mensaje");
 
 		break;
+
 		case 'mostrar_valor_ret': 				
  				$array=mostrar_puntaje('Retiro',$conn);
  				echo $array;
@@ -182,6 +183,7 @@
 				$asignatura=$_POST['asignatura'];
 			   ingresar_solicitud($cedula,$proceso,$fecha,$razon,$periodo,$anio,$especialidad,$nucleo,$estatus,$asignatura,$conn);
  		break;
+
 
 		}//fin switch	
 	}//fin isset[$_post[accion]]

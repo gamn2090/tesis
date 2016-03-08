@@ -21,12 +21,12 @@ if($nivel==$bandera)
   <title>Coordinación Académica</title>
 
   <!-- CSS  -->
-  <link rel="stylesheet" type="text/css" href="../css/jquery.dataTables.css">
   <link href="https://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet">
   <link href="../css/materialize.css" type="text/css" rel="stylesheet" media="screen,projection"/>
   <link href="../css/style.css" type="text/css" rel="stylesheet" media="screen,projection"/>
   <link rel="stylesheet" href="../css/main.css">
-  <link rel="stylesheet" href="../css/font.css">
+    <link rel="stylesheet" href="../css/font.css">
+  <script type="text/javascript" src="../jquery/probandini.js"></script>
 </head>
 <body>
   <nav class="white" role="navigation">
@@ -74,6 +74,7 @@ if($nivel==$bandera)
           <li id="agregarrazon" data-url="nueva_razon.php" class="tab col s2"><a href="#">Nueva Razon</a></li>          
           <li id="CVretiro" data-url="llamada_retiro.php" class="tab col s2"><a href="#">Valores retiro</a></li>          
           <li id="CVcambio" data-url="llamada_CDE.php" class="tab col s2"><a href="#">Valores cambio</a></li>
+          <li id="CVreingreso" data-url="llamada_reingreso.php" class="tab col s2"><a href="#">Valores reingreso</a></li>
         </ul>        
       </div> 
       
@@ -146,10 +147,9 @@ if($nivel==$bandera)
   </footer>
 
 
-   <!--  Scripts-->
+  <!--  Scripts-->
   <script src="https://code.jquery.com/jquery-2.1.4.min.js"></script>
-  <script type="text/javascript" language="javascript" src="../js/jquery.dataTables.js"></script>  
-  <script src="../js/materialize.js"></script> 
+  <script src="../js/materialize.js"></script>
   <script src="../js/init.js"></script>
 
 

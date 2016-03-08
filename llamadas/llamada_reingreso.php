@@ -1,6 +1,6 @@
 <?php
 include ("../procesos/funciones.php");
 include ("../config.php");
-$proceso="Cambio de Especialidad";
+$proceso="Reingreso";
 mostrar_puntaje($proceso,$conn);
 ?>
