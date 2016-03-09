@@ -1,11 +1,9 @@
 <?php	  
- //require_once (".../Clases.php");
-// include ("../pantalla_retiro.php");
+ 
 
-
-/*===========================================================================================================================
-					FUNCION PARA ALMACENAR LOS RETIROS/REINGRESOS REALIZADOS POR LOS ESTUDIANTES
-============================================================================================================================*/
+/*===================================================================================================================================
+					FUNCION PARA ALMACENAR LOS RETIROS/REINGRESOS/CAAMBIOS REALIZADOS POR LOS ESTUDIANTES
+====================================================================================================================================*/
 
 function ingresar_solicitud($cedula,$proceso,$fecha,$razon,$periodo,$anio,$especialidad,$nucleo,$estatus,$asignatura,$conn)
 {
@@ -38,53 +36,58 @@ function ingresar_solicitud($cedula,$proceso,$fecha,$razon,$periodo,$anio,$espec
 	return $bandera;	
 	$conn->Close();
 }
-/*===========================================================================================================================
+/*====================================================================================================================================
 					FUNCION PARA ALMACENAR LOS CAMBIOS DE ESPECIALIDAD REALIZADOS POR LOS ESTUDIANTES
-============================================================================================================================*/
-function ingresar_CDE($cedula,$razon,$carrera_pedida,$fecha,$conn)
+====================================================================================================================================*/
+function ingresar_solicitud_ret($cedula,$proceso,$fecha,$razon,$conn)
 {
-		$query="SELECT * FROM est_esp WHERE  (cedula LIKE '%$cedula%')";
-		$result=$conn->Execute($query);
-		if($result==false)
-		{echo "error al insertar: ".$conn->ErrorMsg()."<br>" ;}
-		else
-		{		
-		while (!$result->EOF) 
-			{ 
-				for ($i=0, $max=$result->FieldCount(); $i < $max; $i++)
-				{	
-					$carrera_actual=$result->fields[1];
-				}			
-				$result->MoveNext();							
-			}		
-		}	
-		$query2="SELECT * FROM esp WHERE  (nombre LIKE '%$carrera_pedida%')";
-		$result=$conn->Execute($query);
-		if($result==false)		
-		{echo "error al insertar: ".$conn->ErrorMsg()."<br>" ;}
-		else
-		{		
-		while (!$result->EOF) 
-			{ 
-				for ($i=0, $max=$result->FieldCount(); $i < $max; $i++)
-				{	
-					$carrera_pedida=$result->fields[0];
-				}			
-				$result->MoveNext();							
-			}		
-		}
-	$query3="INSERT INTO solicitud_CDE (cedula, razon, especialidad_esta_estudiando,especialidad_quiere_estudiar, fecha_solicitud) VALUES ('$cedula', '$razon', '$carrera_actual','%$carrera_pedida%','$fecha')";;
-	if($conn->Execute($query)==false)
+	
+	$query= "INSERT INTO solicitudes_ret (cedula, razon, proceso, fecha_solicitud, exp)
+			VALUES ('$cedula', '$razon', '$proceso', '$fecha', '-1')";
+	
+	$result=$conn->Execute($query);
+	if($result==false)
 	{$bandera=1;}
 	else
 	{$bandera=0;}
-	return $bandera;
+	return $bandera;	
 	$conn->Close();
 }
 
-/*============================================================================================================================
-					FUNCION PARA EL LOGIN DE LOS ESTUDIANTES
-============================================================================================================================*/
+function ingresar_solicitud_rein($cedula,$proceso,$fecha,$conn)
+{
+	
+			
+	$query= "INSERT INTO solicitudes_rein (cedula, proceso, fecha_solicitud, exp)
+			VALUES ('$cedula', '$proceso', '$fecha', '-1')";
+
+	$result=$conn->Execute($query);
+	if($result==false)
+	{$bandera=1;}
+	else
+	{$bandera=0;}
+	return $bandera;	
+	$conn->Close();
+}
+
+function ingresar_solicitud_cde($cedula,$fecha,$especialidad,$asignatura,$conn)
+{
+		
+	$query= "INSERT INTO solicitudes_cde (cedula, especialidad_esta_estudiando,  especialidad_quiere_estudiar, fecha_solicitud, exp) 
+			VALUES ('$cedula', '$especialidad', '$asignatura',  '$fecha', '-1')";
+	
+	$result=$conn->Execute($query);
+	if($result==false)
+	{$bandera=1;}
+	else
+	{$bandera=0;}
+	return $bandera;	
+	$conn->Close();
+}
+
+/*====================================================================================================================================
+												FUNCION PARA EL LOGIN DE LOS ESTUDIANTES
+====================================================================================================================================*/
 
 function loguear($cedula,$contraseña,$conn)
 {	//$contraseña=sha1(md5($contraseña));	
@@ -128,9 +131,9 @@ function loguear($cedula,$contraseña,$conn)
 	$conn->Close();
 		
 }
-/*============================================================================================================================
-					FUNCION PARA EL LOGIN DE LA COORDINACIÓN
-============================================================================================================================*/
+/*====================================================================================================================================
+												FUNCION PARA EL LOGIN DE LA COORDINACIÓN
+====================================================================================================================================*/
 
 function loguear_coord($usuario,$contraseña,$conn)
 {	$contraseña=sha1(md5($contraseña));
@@ -176,9 +179,9 @@ function loguear_coord($usuario,$contraseña,$conn)
 	$conn->Close();
 }
 
-/*============================================================================================================================
-					FUNCION PARA CARGAR Y MOSTRAR LOS DATOS DE LOS ESTUDIANTES AL LOGUEAR
-============================================================================================================================*/
+/*====================================================================================================================================
+									FUNCION PARA CARGAR Y MOSTRAR LOS DATOS DE LOS ESTUDIANTES AL LOGUEAR
+====================================================================================================================================*/
 
 
 function cargar_datos($cedula,$conn)
@@ -200,9 +203,9 @@ function cargar_datos($cedula,$conn)
 	$conn->Close();
 }
 
-/*============================================================================================================================
-					FUNCION PARA EL LOGIN DE LOS USUARIOS DE LA COORDINACION AL LOGUEAR
-============================================================================================================================*/
+/*====================================================================================================================================
+							FUNCION PARA EL LOGIN DE LOS USUARIOS DE LA COORDINACION AL LOGUEAR
+====================================================================================================================================*/
 
 
 function cargar_datos_coord($usuario,$conn)
@@ -236,9 +239,10 @@ function cargar_datos_coord($usuario,$conn)
 	$conn->Close();
 }
 
-/*===========================================================================================================================
- FUNCION PARA VISUALIZAR LA BASE DE DATOS HISTORICA  	
- ======================================================================================================================*/
+/*====================================================================================================================================
+									 FUNCION PARA VISUALIZAR LA BASE DE DATOS HISTORICA  	
+====================================================================================================================================*/
+
 function visualizar_historico($nivel,$conn)
 {
 			$query="SELECT * FROM decisiones";	
@@ -290,9 +294,9 @@ function visualizar_historico($nivel,$conn)
 			}
 				$conn->Close();			
 }
-/*===========================================================================================================================
-					FUNCION PARA MOSTRAR LOS PROCESOS EN TABLAS
-============================================================================================================================*/
+/*====================================================================================================================================
+												FUNCION PARA MOSTRAR LOS PROCESOS EN TABLAS
+====================================================================================================================================*/
 
 function mostrar_proceso($proceso,$bandera,$nivel,$conn)
 {   if($proceso=="Retiro")
@@ -532,6 +536,7 @@ function mostrar_proceso($proceso,$bandera,$nivel,$conn)
 /*============================================================================================================================
 					FUNCION PARA APROBAR O RECHAZAR CAMBIOS
 ==============================================================================================================================*/
+
 function ingresar_cambio($demanda,$oferta,$carrera,$conn)
 {
 		$query="SELECT * FROM esp WHERE (nombre LIKE '%$carrera%')";
@@ -1496,7 +1501,7 @@ function validar_solicitud($numero_soli,$anio,$fecha,$cedula,$razon,$solicitud_a
 }
 
 /*============================================================================================================================
-					FUNCION PARA VER LA CANTIDAD DE SOLICITUDES REALIZADAS POR UN ESTUDIANTE EN LA BD DE MI TESIS
+					FUNCION PARA VER LA CANTIDAD DE SOLICITUDES REALIZADAS POR UN ESTUDIANTE EN LA BD 
 =============================================================================================================================*/
 
 function cantidad_solicitud_historico($cedula,$proceso,$conn)
@@ -1521,7 +1526,7 @@ function cantidad_solicitud_historico($cedula,$proceso,$conn)
 }
 
 /*============================================================================================================================
-					FUNCION PARA VER SI TIENE O NO SOLICITUDES EN LA BD DE MI TESIS
+					FUNCION PARA VER SI TIENE O NO SOLICITUDES EN LA BD 
 ============================================================================================================================*/
 
 function buscar_historico($cedula,$conn,$proceso)
@@ -1615,7 +1620,7 @@ function mostrar_datos_para_solicitud($solicitud,$cedula,$fecha,$conn)
 	}
 	$estatus="Recibido";
 ?>	
-	<form class="cbp-mc-form" name="Evaluar_estudiante" id="Evaluar_estudiante" action="../procesos/motor_funciones.php" method="POST">
+	<form class="cbp-mc-form" name="Evaluar_estudiante" id="Evaluar_estudiante" action="seleccion_opciones.php" method="POST">
         <div class="cbp-mc-column">
          <!-- Inputs hiddens -->
         <input type="hidden" id="periodo" name="periodo" value="<?php echo $periodo ?>">
@@ -1695,8 +1700,7 @@ function mostrar_datos_para_solicitud($solicitud,$cedula,$fecha,$conn)
         
         </select>  
          <?php }?>     
-         <div class="cbp-mc-submit-wrap"><input class="cbp-mc-submit" type="submit" 
-        value="Evaluar estudiante" /></div>
+         <div class="cbp-mc-submit-wrap"><input type="submit" value="Correcto" /></div>
         
 
        </div>      
@@ -1739,7 +1743,7 @@ return $fecha;
 }
 
 /*============================================================================================================================
-					FUNCIONES PARA SABER QUE DÍA METIO LA SOLICITUD Y SI ESTA A TIEMPO O NO
+					FUNCIONES PARA SABER EL AÑO
 ==============================================================================================================================*/
 function obtener_anio($fecha)
 {
@@ -2064,7 +2068,7 @@ function DECISION($fecha,$cedula,$razon,$nombre,$apellido,$discapacidad,$promedi
 	$conn->Close();
 }
 /*============================================================================================================================																																								                                            
-FUNCION PARA MOSTRAR LAS DECISIONES 	
+						FUNCION PARA MOSTRAR LAS DECISIONES REALIZADAS
 ======================================================================================================================*/
 
 function mostrar_decision($exp,$fecha_solicitud,$cedula,$pros_aca,$razon,$solicitud_actual,$decision,$solicitudes_anteriores,$medidas_resul,$tiempo_soli,$razon_aval,$conn)
@@ -2254,7 +2258,7 @@ function crear_cuenta($cedula,$nombre,$apellido,$sexo,$usuario,$contraseña,$pri
 	$conn->Close();
 }
 /*============================================================================================================================
-FUNCION PARA INGRESAR NUEVAS RAZONES   	
+								FUNCION PARA INGRESAR NUEVAS RAZONES   	
 ======================================================================================================================*/
 function ingresar_razon($proceso,$razon,$puntaje,$porcentaje,$fecha,$conn)
 {
@@ -2273,7 +2277,7 @@ function ingresar_razon($proceso,$razon,$puntaje,$porcentaje,$fecha,$conn)
 }
 
 /*============================================================================================================================	
-FUNCION PARA MOSTRAR LOS PUNTAJES DE LAS RAZONES   	
+								FUNCION PARA MOSTRAR LOS PUNTAJES DE LAS RAZONES   	
 ======================================================================================================================*/
 function mostrar_puntaje($proceso,$conn)
 {//$proceso="Retiro";
@@ -2379,7 +2383,7 @@ function cambiar_valor_TDD($proceso,$razon,$puntaje,$conn)
 $conn->Close();
 }
 /*============================================================================================================================	
-FUNCION PARA CAMBIAR LOS PUNTAJES DE LAS RAZONES 2  	
+						FUNCION PARA CAMBIAR LOS PUNTAJES DE LAS RAZONES 2  	
 ======================================================================================================================*/
 function actualizar_puntaje($proceso,$razon,$puntaje,$fecha,$conn)
 {
@@ -2396,7 +2400,7 @@ function actualizar_puntaje($proceso,$razon,$puntaje,$fecha,$conn)
 	$conn->Close();
 }
 /*============================================================================================================================
- FUNCION PARA INGRESAR EN LA BASE DE DATOS HISTORICA  	
+ 								FUNCION PARA INGRESAR EN LA BASE DE DATOS HISTORICA  	
  ======================================================================================================================*/
 
 function ingresar_historico($exp,$cedula,$fecha_solicitud,$razon,$promedio,$solicitudes,$solicitud_actual,$aval,$fecha,$medidas,$decision,$observaciones,$acuerdo,$conn)
@@ -2621,8 +2625,8 @@ return $bandera;
 $conn->Close();
 }
 /*===========================================================================================================================
- FUNCION PARA CERRAR LA SESSION
- ======================================================================================================================*/
+ 									FUNCION PARA CERRAR LA SESSION
+=============================================================================================================================*/
 function cerrar_sesion()
 {
 	session_start();
@@ -2632,8 +2636,8 @@ function cerrar_sesion()
 }
 
 /*===========================================================================================================================
- FUNCION PARA VISUALIZAR ANTIGUAS DECISIONES	
- ======================================================================================================================*/
+ 						FUNCION PARA VISUALIZAR ANTIGUAS DECISIONES	
+============================================================================================================================*/
 
 function estudiar_decision($fecha,$cedula,$solicitud,$conn)
 {
@@ -2755,7 +2759,7 @@ $conn->Close();
 }
 
 /*===================================================================================================================================================
-														FUNCION para mostrar solicitudes distintas
+											FUNCION PARA MOSTRAR LAS SOLICITUDES ANTERIORES HECHAS
 =====================================================================================================================================================*/
 function visualizar_antecedentes($razon,$promedio,$solicitudes,$solicitud_actual,$aval,$tiempo_sol,$medidas,$conn)
 {	
@@ -2800,7 +2804,7 @@ function visualizar_antecedentes($razon,$promedio,$solicitudes,$solicitud_actual
 /*=================================================================================================================================
 								CALCULAR GRUPO
 ===================================================================================================================================*/
-function evaluar_reingreso($cedula, $razon, $fecha, $conn)
+function evaluar_reingreso($cedula, $cambios, $fecha, $conn)
 {
 	$query="SELECT COUNT(*) cont FROM notas WHERE ((per = '1') OR (per = '2')) AND cedula = '".$cedula."' ";
 	$result = $conn->Execute($query);
@@ -2836,10 +2840,84 @@ function evaluar_reingreso($cedula, $razon, $fecha, $conn)
 			for ($i=0, $max=$result2->FieldCount(); $i<$max; $i++)
 			{
 				$creditos_apro=$result2->fields[0];
+				$creditos_titulo=$result2->fields[1];
 				$result2->MoveNext();											
 				break;	
 			}
 		}
+	}
+	$query3="SELECT tipo_medida FROM medidas_academicas WHERE cedula LIKE '".$cedula."'";
+	$result3 = $conn->Execute($query3);
+	if($result3==false)
+	{
+		echo "error al recuperar: ".$conn->ErrorMsg()."<br>" ;
+	}
+	else
+	{ $cont_medida=0;
+		while(!$result3->EOF) 
+		{	$cont_medida++;		
+			for ($i=0, $max=$result3->FieldCount(); $i<$max; $i++)
+			{
+				$medida=$result3->fields['tipo_medida'];
+				$result3->MoveNext();											
+				break;	
+			}
+		}
+	}
+	/*
+		"1" -> "repite 1 vez"
+		"2" -> "repite 2 o 3 veces"
+		"3" -> "repite 4 veces"
+		"4" -> "repite 5 veces"
+		"5" -> "repite 6 veces"
+		"6" -> "permanencia del 25%"
+	*/
+	
+	if(($Cont >= 10) && ($creditos_apro < ($creditos_titulo/2)) && $cambios > 0)
+	{
+		$grupo = 1;
+	}
+	else
+	{
+		if(($Cont >= 10) && ($creditos_apro < ($creditos_titulo/2)) && $cambios = 0)
+		{
+			$grupo = 2;
+		}
+		else
+		{
+			if($medida=='4')	
+			{
+				$grupo = 3;
+			}
+			else
+			{
+				if($cambios > 0 && $cont_medida == 0)
+				{
+					$grupo = 4;
+				}	
+				else
+				{
+					if($medida=='5')
+					{
+						$grupo= 5;
+					}	
+					else
+					{
+						if($medida=='6')
+						{
+							$grupo = 6;	
+						}	
+						else
+						{
+							if($cambios == 0 && $medida == 0)
+							{
+								$grupo = 7;
+							}	
+						}
+					}
+				}
+			}
+		}	
 	}
 	
 }
@@ -2911,12 +2989,13 @@ function cargar_solicitudes($proceso,$conn)
 						$cedula=$result->fields['cedula'];
 						$razon=$result->fields['observacion'];
 						$fecha_sol=$result->fields['fecha'];
-						$exp='-1';
+						//$exp='-1';
 						$proceso='Retiro';
 						$result->MoveNext();											
 						break;	
 					}
-				}	
+				}
+				ingresar_solicitud_ret($cedula,$proceso,$fecha_sol,$razon,$conn);	
 		}
 		if($proceso=='Reingreso')
 		{							
@@ -2926,12 +3005,14 @@ function cargar_solicitudes($proceso,$conn)
 					{		
 						$cedula=$result->fields['cedula'];
 						$fecha_sol=$result->fields['fecha'];
-						$cedula='-1';
+						//$exp='-1';
 						$proceso='Reingreso';
 						$result->MoveNext();											
 						break;	
 					}
 				}
+				ingresar_solicitud_rein($cedula,$proceso,$fecha_sol,$conn);
+				
 		}			
 		if($proceso=='Cambio')
 		{
@@ -2942,16 +3023,17 @@ function cargar_solicitudes($proceso,$conn)
 						$cedula=$result->fields['cedula'];
 						$carrera_pedi=$result->fields['observacion'];
 						$fecha_sol=$result->fields['fecha'];
-						$exp='-1';
+						//$exp='-1';
 						$result->MoveNext();											
 						break;	
 					}						
 				}
-				$carrera_act=buscar_carrera($cedula,$conn);		
-		}		
+				$carrera_act=buscar_carrera($cedula,$conn);	
+				ingresar_solicitud_cde($cedula,$fecha_sol,$carrera_act,$carrera_pedi,$conn);	
+		}	
+			
 	}
 	$conn->Close();
-
 }
 
 ?>

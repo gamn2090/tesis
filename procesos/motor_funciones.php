@@ -170,7 +170,8 @@
  				$array=mostrar_puntaje('Cambio',$conn);
  				echo $array;
  		break;	
-		case 'Evaluar estudiante': 				
+		/*case 'Correcto': 
+		//echo "holis";					
  				$cedula=$_POST['cedula'];
 				$proceso=$_POST['solicitud'];
 				$fecha=$_POST['fecha'];
@@ -181,8 +182,10 @@
 				$nucleo=$_POST['nucleo'];
 				$estatus=$_POST['estatus'];
 				$asignatura=$_POST['asignatura'];
-			   ingresar_solicitud($cedula,$proceso,$fecha,$razon,$periodo,$anio,$especialidad,$nucleo,$estatus,$asignatura,$conn);
- 		break;
+			    $bandera=ingresar_solicitud($cedula,$proceso,$fecha,$razon,$periodo,$anio,$especialidad,$nucleo,$estatus,$asignatura,$conn);
+			    $cedula2=base64_encode($cedula);
+				header("location: pantalla_retiro.php?cedula=$cedula2&bandera=$bandera");
+ 		break;*/
 
 
 		}//fin switch	
