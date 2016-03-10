@@ -12,6 +12,9 @@ if($usuario!= NULL)
   <meta http-equiv="Content-Type" content="text/html; charset=UTF-8"/>
   <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1.0, user-scalable=no"/>
   <title>Coordinación Académica</title>
+	
+</head>
+
 
   <!-- CSS  -->
   <link href="https://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet">
@@ -198,7 +201,7 @@ if($usuario!= NULL)
         {
         ?> 
       <div class="row">
-        <div class="col s12 m4">
+        <div class="col s12 m3">
           <div class="icon-block">
                          
                 <div id="fb-root"></div>
@@ -212,9 +215,23 @@ if($usuario!= NULL)
               <div class="fb-page" data-href="https://www.facebook.com/pagina.cacns" data-small-header="false"      data-adapt-container-width="true" data-hide-cover="false" data-show-facepile="true" data-show-posts="true"><div class="fb-xfbml-parse-ignore"><blockquote cite="https://www.facebook.com/facebook"><a href="https://www.facebook.com/facebook">Facebook</a></blockquote></div></div>                 
             </div>             
         </div> 
+		
+         <div class="col s12 m3">
+          <div class="icon-block">
+            <div class="col s12 m6 offset-m6 l6 offset-l3">                
+                  <div class="row valign-wrapper">
+                    <div class="col s12">
+                       <a href="llamadas/obtener_procesos.php"><img src="img/obtener.png" alt="" class="circle responsive-img"></a> <!-- notice the "circle" class -->
+                    </div>                   
+                  </div>                
+            </div>   
+            <h5 class="center">Cargar Procesos</h5>
 
+            <p class="light">Obtenga nuevas solicitudes validadas por control de estudio.</p>
+          </div>
+        </div>  
         
-        <div class="col s12 m4">
+        <div class="col s12 m3">
           <div class="icon-block">
             <div class="col s12 m6 offset-m6 l6 offset-l3">                
                   <div class="row valign-wrapper">
@@ -222,14 +239,15 @@ if($usuario!= NULL)
                        <a href="llamadas/procesos.php"><img src="img/reingreso.png" alt="" class="circle responsive-img"></a> <!-- notice the "circle" class -->
                     </div>                   
                   </div>                
-            </div>   
+            </div>  
+            
             <h5 class="center">Procesos</h5>
 
             <p class="light">Visualice y evalue las solicitudes de los procesos de retiro, reingreso y cambio de especialidad que los estudiantes ingresan mediante el portal de siceudo.</p>
           </div>
         </div>  
 
-        <div class="col s12 m4">
+        <div class="col s12 m3">
           <div class="icon-block">
              <a class="twitter-timeline"  href="https://twitter.com/cacns_udo_sucre" data-widget-id="667340026104164352">Tweets by @cacns_udo_sucre</a>
       <script>!function(d,s,id){var js,fjs=d.getElementsByTagName(s)[0],p=/^http:/.test(d.location)?'http':'https';if(!d.getElementById(id)){js=d.createElement(s);js.id=id;js.src=p+"://platform.twitter.com/widgets.js";fjs.parentNode.insertBefore(js,fjs);}}(document,"script","twitter-wjs");</script>

@@ -1686,11 +1686,11 @@ function mostrar_datos_para_solicitud($solicitud,$cedula,$fecha,$conn)
 					{			
 						for ($i=0, $max=$result->FieldCount(); $i<$max; $i++)
 						{
-							$asignatura=$result->fields['nombre'];					
-							
+							$asignatura2=$result->fields['nombre'];					
+							$asignatura=$result->fields['codigo'];
 						}	
 						?>
-                        <option><?php echo $asignatura; ?> </option>
+                        <option><?php echo $asignatura." - ".$asignatura2;?> </option>
                         <?php					
 						$result->MoveNext();
 					}
@@ -2927,7 +2927,7 @@ function evaluar_reingreso($cedula, $cambios, $fecha, $conn)
 
 function buscar_carrera($cedula,$conn)
 {
-	$query="SELECT especialidad FROM est_esp where cedula='".$cedula."'";
+	$query="SELECT * FROM est_esp where cedula='".$cedula."'";
 	$result=$conn->Execute($query);
 	if($result==false)
 	{
@@ -2935,8 +2935,17 @@ function buscar_carrera($cedula,$conn)
 	}
 	else
 	{	
-		return $result;
+		while(!$result->EOF) 
+		{	$cont++;		
+			for ($i=0, $max=$result->FieldCount(); $i<$max; $i++)
+			{				
+				$especialidad=$result->fields['especialidad'];				
+				$result->MoveNext();											
+				break;	
+			}
+		}	
 	}
+	return $especialidad;
 }
 
 /*===================================================================================================================================
@@ -2945,32 +2954,35 @@ function buscar_carrera($cedula,$conn)
 function cargar_solicitudes($proceso,$conn)
 {
 	switch($proceso){
-	case 'retiro':
-		$query="SELECT solicitudes.* FROM solicitudes, solicitudes_ret
-			WHERE (solicitudes.fecha <> solicitudes_ret.fecha_solicitud AND  
-			solicitudes.cedula = solicitudes_ret.cedula AND 
-			solicitudes.estatus = 'aprobado') OR
-			(solicitudes.fecha <> solicitudes_ret.fecha_solicitud AND  
-			solicitudes.cedula <> solicitudes_ret.cedula AND 
-			solicitudes.estatus = 'aprobado') ";
+	case 'Retiro':
+		$query="SELECT a.*
+				FROM solicitudes a
+				WHERE not exists ( select 1
+								   from solicitudes_ret b
+								   where b.cedula = a.cedula
+								   and b.fecha_solicitud = a.fecha )
+				and a.t_solicitud = '".$proceso."' 
+				and a.estatus	  = 'aprobado'";
 	break;
-	case 'reingreso':
-		$query="SELECT solicitudes.* FROM solicitudes, solicitudes_rein
-			WHERE (solicitudes.fecha <> solicitudes_rein.fecha_solicitud AND  
-			solicitudes.cedula = solicitudes_rein.cedula AND 
-			solicitudes.estatus = 'aprobado') OR
-			(solicitudes.fecha <> solicitudes_rein.fecha_solicitud AND  
-			solicitudes.cedula <> solicitudes_rein.cedula AND 
-			solicitudes.estatus = 'aprobado')";
+	case 'Reingreso':
+		$query="SELECT a.*
+				FROM solicitudes a
+				WHERE not exists ( select 1
+								   from solicitudes_rein b
+								   where b.cedula = a.cedula
+								   and b.fecha_solicitud = a.fecha )
+				and a.t_solicitud = '".$proceso."' 
+				and a.estatus	  = 'aprobado'";
 	break;
-	case 'cambio':
-		$query="SELECT solicitudes.* FROM solicitudes, solicitudes_cde
-			WHERE (solicitudes.fecha <> solicitudes_cde.fecha_solicitud AND  
-			solicitudes.cedula = solicitudes_cde.cedula AND 
-			solicitudes.estatus = 'aprobado') OR
-			(solicitudes.fecha <> solicitudes_cde.fecha_solicitud AND  
-			solicitudes.cedula <> solicitudes_cde.cedula AND 
-			solicitudes.estatus = 'aprobado')";			
+	case 'Cambio':
+		$query="SELECT a.*
+				FROM solicitudes a
+				WHERE not exists ( select 1
+								   from solicitudes_cde b
+								   where b.cedula = a.cedula
+								   and b.fecha_solicitud = a.fecha )
+				and a.t_solicitud = '".$proceso."' 
+				and a.estatus	  = 'aprobado'";		
 	break;
 	}
 	$result  = $conn->Execute($query);
@@ -2979,11 +2991,11 @@ function cargar_solicitudes($proceso,$conn)
 		echo "error al recuperar: ".$conn->ErrorMsg()."<br>" ;
 	}
 	else
-	{	
+	{	$cont=0;
 		if($proceso=='Retiro')
-		{
+		{   
 			while(!$result->EOF) 
-				{			
+				{	$cont++;		
 					for ($i=0, $max=$result->FieldCount(); $i<$max; $i++)
 					{				
 						$cedula=$result->fields['cedula'];
@@ -2994,13 +3006,13 @@ function cargar_solicitudes($proceso,$conn)
 						$result->MoveNext();											
 						break;	
 					}
-				}
-				ingresar_solicitud_ret($cedula,$proceso,$fecha_sol,$razon,$conn);	
+					ingresar_solicitud_ret($cedula,$proceso,$fecha_sol,$razon,$conn);
+				}					
 		}
 		if($proceso=='Reingreso')
-		{							
+		{	$cont=0;
 				while(!$result->EOF) 
-				{			
+				 {	$cont++;	
 					for ($i=0, $max=$result->FieldCount(); $i<$max; $i++)
 					{		
 						$cedula=$result->fields['cedula'];
@@ -3010,14 +3022,13 @@ function cargar_solicitudes($proceso,$conn)
 						$result->MoveNext();											
 						break;	
 					}
-				}
-				ingresar_solicitud_rein($cedula,$proceso,$fecha_sol,$conn);
-				
+					ingresar_solicitud_rein($cedula,$proceso,$fecha_sol,$conn);
+				}				
 		}			
 		if($proceso=='Cambio')
-		{
+		{	$cont=0;
 				while(!$result->EOF) 
-				{			
+				{	$cont++;			
 					for ($i=0, $max=$result->FieldCount(); $i<$max; $i++)
 					{
 						$cedula=$result->fields['cedula'];
@@ -3026,13 +3037,14 @@ function cargar_solicitudes($proceso,$conn)
 						//$exp='-1';
 						$result->MoveNext();											
 						break;	
-					}						
-				}
-				$carrera_act=buscar_carrera($cedula,$conn);	
-				ingresar_solicitud_cde($cedula,$fecha_sol,$carrera_act,$carrera_pedi,$conn);	
+					}
+					$carrera_act=buscar_carrera($cedula,$conn);	
+					ingresar_solicitud_cde($cedula,$fecha_sol,$carrera_act,$carrera_pedi,$conn);						
+				}				
 		}	
 			
 	}
+	return $cont;
 	$conn->Close();
 }
 

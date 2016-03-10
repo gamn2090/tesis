@@ -11,7 +11,7 @@ include('../procesos/funciones.php');
 				$especialidad=$_POST['especialidad'];
 				$nucleo=$_POST['nucleo'];
 				$estatus=$_POST['estatus'];
-				$asignatura=$_POST['asignatura'];
+				$asignatura=substr($_POST['asignatura'],0,6);
 			    $bandera=ingresar_solicitud($cedula,$proceso,$fecha,$razon,$periodo,$anio,$especialidad,$nucleo,$estatus,$asignatura,$conn);
 			    $cedula2=base64_encode($cedula);
 				header("location: pantalla_retiro.php?cedula=$cedula2&bandera=$bandera");

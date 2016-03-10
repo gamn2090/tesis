@@ -186,7 +186,11 @@
 			    $cedula2=base64_encode($cedula);
 				header("location: pantalla_retiro.php?cedula=$cedula2&bandera=$bandera");
  		break;*/
-
+		case 'cargar': 
+				$proceso=$_POST['proceso'];				
+ 				$bandera=cargar_solicitudes($proceso,$conn);
+ 				header("location: ../llamadas/obtener_procesos.php?mensaje=$bandera");
+ 		break;	
 
 		}//fin switch	
 	}//fin isset[$_post[accion]]
