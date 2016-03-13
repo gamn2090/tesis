@@ -20,7 +20,7 @@ session_start();
 	include ("../config.php");
 ?>
 </head>
-<body onload="myFunction()">
+<body>
 <nav class="white" role="navigation">
     <div class="nav-wrapper container">
       <a id="logo-container" href="../coordinacion_principal.php" class="brand-logo"><img src="../img/udo.gif" alt=""></a>
@@ -81,10 +81,10 @@ session_start();
           { 
           ?>    
                 <script>
-                    function myFunction() {
+                   
                         alert("Resultado guardado exitosamente");
                         window.close();
-                    }
+                   
                 </script>
           <?php
           }
@@ -94,10 +94,10 @@ session_start();
             {
             ?>          
                   <script>
-                      function myFunction() {
+                    
                           alert("Resultado no guardado");
                           window.close();
-                      }
+                      
                   </script>      
             <?php
             }

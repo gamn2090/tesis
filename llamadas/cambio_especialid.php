@@ -26,7 +26,7 @@ $bandera=$_SESSION['bandera'];
           <thead>
               <tr>
                   <th>cedula</th>
-                  <th>numero</th>
+                  <th>Solicitud num.</th>
                   <th>carrera actual</th>  
                   <th>carrera siguiente</th>  
                   <th>accion</th>               
@@ -35,7 +35,7 @@ $bandera=$_SESSION['bandera'];
           <tfoot>
               <tr>
                   <th>cedula</th>
-                  <th>numero</th>
+                  <th>Solicitud num.</th>
                   <th>carrera actual</th>  
                   <th>carrera siguiente</th>  
                   <th>accion</th>               

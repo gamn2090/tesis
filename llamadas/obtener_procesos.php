@@ -27,7 +27,7 @@ if($usuario!= NULL)
   <link rel="stylesheet" href="../css/main.css">
   <link rel="stylesheet" href="../css/font.css">
 </head>
-<body onload="myFunction()">
+<body>
 
   <nav class="white" role="navigation">
     <div class="nav-wrapper container">
@@ -80,31 +80,7 @@ if($usuario!= NULL)
    
              
         <div id="main" class="col s12">   
-        <?php
-			if(isset($_GET['mensaje']) && $_GET['mensaje']>0)
-			 {
-			  ?>          
-					<script>
-						function myFunction() {
-							alert(<?php echo $_GET['mensaje']; ?> " solicitudes incertadas");
-						}
-					</script>      
-			  <?php
-			  }
-			  else
-			  {
-				if(isset($_GET['mensaje']) && $_GET['mensaje']=0)
-				{
-				?>
-					<script>
-						function myFunction() {
-							alert("no hay nuevas solicitudes");
-						}
-					</script> 
-				  <?php	
-				}  
-			  }
-		?>      		
+        
                 <form id="cargar_procesos" class="col s12" action="../procesos/motor_funciones.php" method="POST">
    	
 					        
@@ -199,6 +175,31 @@ if($usuario!= NULL)
   <script type="text/javascript" language="javascript" src="../js/jquery.dataTables.js"></script>  
   <script src="../js/materialize.js"></script> 
   <script src="../js/init.js"></script>
+  <?php
+      if(isset($_GET['mensaje']) && $_GET['mensaje']>0)
+       {  $cant=$_GET['mensaje'];
+        ?>          
+          <script>
+            
+                     alert("Solicitudes insertadas");
+            
+          </script>      
+        <?php
+        }
+        else
+        {
+        if(isset($_GET['mensaje']) && $_GET['mensaje']==0)
+        {
+        ?>
+          <script>
+            
+              alert("No hay nuevas solicitudes");
+            
+          </script> 
+          <?php 
+        }  
+        }
+    ?>          
   </body>
 </html>
 <?php

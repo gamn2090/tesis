@@ -19,7 +19,7 @@ $bandera=$_SESSION['bandera'];
         <thead>
             <tr>
                 <th>cedula</th>
-                <th>numero</th>
+                <th>Solicitud número</th>
                 <th>razon</th>  
                 <th>accion</th>               
             </tr>
@@ -27,7 +27,7 @@ $bandera=$_SESSION['bandera'];
         <tfoot>
             <tr>
                 <th>cedula</th>
-                <th>numero</th>
+                <th>Solicitud número</th>              
                 <th>razon</th>  
                  <th>accion</th>               
             </tr>
@@ -57,7 +57,7 @@ $(document).ready(function(){
                               },
                     "sAjaxDataProp": "",
                     "processing": true,
-                    "pageLength": 20,
+                    //"pageLength": 20,
                    // "serverSide": true,
                      columns: 
                      [
