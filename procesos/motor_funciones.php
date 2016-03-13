@@ -187,9 +187,17 @@
 				header("location: pantalla_retiro.php?cedula=$cedula2&bandera=$bandera");
  		break;*/
 		case 'cargar': 
-				$proceso=$_POST['proceso'];				
- 				$bandera=cargar_solicitudes($proceso,$conn);
- 				header("location: ../llamadas/obtener_procesos.php?mensaje=$bandera");
+				$proceso=$_POST['proceso'];		
+				if($proceso!='')
+				{		
+	 				$bandera=cargar_solicitudes($proceso,$conn);
+	 				header("location: ../llamadas/obtener_procesos.php?mensaje=$bandera");
+ 				}
+ 				else
+ 				{	
+ 					$bandera='900';
+ 					header("location: ../llamadas/obtener_procesos.php?mensaje=$bandera");
+ 				}
  		break;	
 
 		}//fin switch	

@@ -3016,9 +3016,13 @@ function cargar_solicitudes($proceso,$conn)
 		$query="SELECT a.*
 				FROM solicitudes a
 				WHERE not exists ( select 1
-								   from solicitudes_ret b
+								   from solicitudes_ret b, decisiones c
 								   where b.cedula = a.cedula
 								   and b.fecha_solicitud = a.fecha )
+				and not exists   ( select 1
+								   from decisiones c
+								   where c.cedula = a.cedula
+								   and c.fecha_solicitud = a.fecha )
 				and a.t_solicitud = '".$proceso."' 
 				and a.estatus	  = 'aprobado'";
 	break;
@@ -3029,6 +3033,10 @@ function cargar_solicitudes($proceso,$conn)
 								   from solicitudes_rein b
 								   where b.cedula = a.cedula
 								   and b.fecha_solicitud = a.fecha )
+				and not exists   ( select 1
+								   from decisiones c
+								   where c.cedula = a.cedula
+								   and c.fecha_solicitud = a.fecha )
 				and a.t_solicitud = '".$proceso."' 
 				and a.estatus	  = 'aprobado'";
 	break;
@@ -3039,6 +3047,10 @@ function cargar_solicitudes($proceso,$conn)
 								   from solicitudes_cde b
 								   where b.cedula = a.cedula
 								   and b.fecha_solicitud = a.fecha )
+				and not exists   ( select 1
+								   from decisiones c
+								   where c.cedula = a.cedula
+								   and c.fecha_solicitud = a.fecha )
 				and a.t_solicitud = '".$proceso."' 
 				and a.estatus	  = 'aprobado'";		
 	break;

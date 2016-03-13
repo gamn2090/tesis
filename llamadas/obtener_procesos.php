@@ -90,18 +90,18 @@ if($usuario!= NULL)
 						      <option value="" disabled selected>Proceso a cargar</option>
 						      <option value="Retiro">Retiro académico</option>
 						      <option value="Reingreso">Reingreso académico</option>
-                              <option value="Cambio">Cambio de especialidad</option>
+                  <option value="Cambio">Cambio de especialidad</option>
 						    </select>
 						    </div>
 						   	</div>
-                            <div class="divider"></div>
-		                    <div class="row">                       
-		                        <div class="col m12 offset">
-		                            <p class="center-align">
-		                                <button class="btn btn-large waves-effect waves-light" id="cargar" type="submit" value="cargar" name="accion" title="login">Cargar Procesos</button>
-		                            </p>
-		                        </div>
-		                    </div>
+                <div class="divider"></div>
+                <div class="row">                       
+                    <div class="col m12 offset">
+                        <p class="center-align">
+                            <button class="btn btn-large waves-effect waves-light" id="cargar" type="submit" value="cargar" name="accion" title="login">Cargar Procesos</button>
+                        </p>
+                    </div>
+                </div>
 					</form>	
                 
         </div>
@@ -176,7 +176,7 @@ if($usuario!= NULL)
   <script src="../js/materialize.js"></script> 
   <script src="../js/init.js"></script>
   <?php
-      if(isset($_GET['mensaje']) && $_GET['mensaje']>0)
+      if(isset($_GET['mensaje']) && $_GET['mensaje']>0 && $_GET['mensaje']!='900')
        {  $cant=$_GET['mensaje'];
         ?>          
           <script>
@@ -188,16 +188,27 @@ if($usuario!= NULL)
         }
         else
         {
-        if(isset($_GET['mensaje']) && $_GET['mensaje']==0)
-        {
-        ?>
-          <script>
-            
-              alert("No hay nuevas solicitudes");
-            
-          </script> 
-          <?php 
-        }  
+          if(isset($_GET['mensaje']) && $_GET['mensaje']==0)
+          {
+          ?>
+            <script>
+              
+                alert("No hay nuevas solicitudes");
+              
+            </script> 
+            <?php 
+          }
+          else
+          {
+              if(isset($_GET['mensaje']) && $_GET['mensaje']=='900')  
+              {?>
+                <script>
+              
+                alert("Elija un proceso");
+              
+                </script> <?php 
+              }     
+          }
         }
     ?>          
   </body>
