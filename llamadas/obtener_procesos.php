@@ -81,19 +81,19 @@ if($usuario!= NULL)
              
         <div id="main" class="col s12">   
         <?php
-			if(isset($_GET['mensaje']) && $_GET['mensaje']>0)
+			if(isset($_REQUEST['mensaje']) && $_REQUEST['mensaje']>0)
 			 {
 			  ?>          
 					<script>
 						function myFunction() {
-							alert(<?php echo $_GET['mensaje']; ?> " solicitudes incertadas");
+							alert(<?php echo $_REQUEST['mensaje']; ?> " solicitudes incertadas");
 						}
 					</script>      
 			  <?php
 			  }
 			  else
 			  {
-				if(isset($_GET['mensaje']) && $_GET['mensaje']=0)
+				if(isset($_REQUEST['mensaje']) && $_REQUEST['mensaje']=0)
 				{
 				?>
 					<script>
@@ -105,7 +105,7 @@ if($usuario!= NULL)
 				}  
 			  }
 		?>      		
-                <form id="cargar_procesos" class="col s12" action="../procesos/motor_funciones.php" method="POST">
+                <form id="cargar_procesos" class="col s12" action="../procesos/motor_funciones.php"  method="POST">
    	
 					        
 					        <div class="row">
