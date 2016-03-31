@@ -27,7 +27,7 @@ if($usuario!= NULL)
   <link rel="stylesheet" href="../css/main.css">
   <link rel="stylesheet" href="../css/font.css">
 </head>
-<body onload="myFunction()">
+<body>
 
   <nav class="white" role="navigation">
     <div class="nav-wrapper container">
@@ -80,6 +80,7 @@ if($usuario!= NULL)
    
              
         <div id="main" class="col s12">   
+<<<<<<< HEAD
         <?php
 			if(isset($_REQUEST['mensaje']) && $_REQUEST['mensaje']>0)
 			 {
@@ -106,6 +107,10 @@ if($usuario!= NULL)
 			  }
 		?>      		
                 <form id="cargar_procesos" class="col s12" action="../procesos/motor_funciones.php"  method="POST">
+=======
+        
+                <form id="cargar_procesos" class="col s12" action="../procesos/motor_funciones.php" method="POST">
+>>>>>>> be1b4f35d6d9bb4fe6db68dc10dc074a99ff8d24
    	
 					        
 					        <div class="row">
@@ -114,18 +119,18 @@ if($usuario!= NULL)
 						      <option value="" disabled selected>Proceso a cargar</option>
 						      <option value="Retiro">Retiro académico</option>
 						      <option value="Reingreso">Reingreso académico</option>
-                              <option value="Cambio">Cambio de especialidad</option>
+                  <option value="Cambio">Cambio de especialidad</option>
 						    </select>
 						    </div>
 						   	</div>
-                            <div class="divider"></div>
-		                    <div class="row">                       
-		                        <div class="col m12 offset">
-		                            <p class="center-align">
-		                                <button class="btn btn-large waves-effect waves-light" id="cargar" type="submit" value="cargar" name="accion" title="login">Cargar Procesos</button>
-		                            </p>
-		                        </div>
-		                    </div>
+                <div class="divider"></div>
+                <div class="row">                       
+                    <div class="col m12 offset">
+                        <p class="center-align">
+                            <button class="btn btn-large waves-effect waves-light" id="cargar" type="submit" value="cargar" name="accion" title="login">Cargar Procesos</button>
+                        </p>
+                    </div>
+                </div>
 					</form>	
                 
         </div>
@@ -199,6 +204,42 @@ if($usuario!= NULL)
   <script type="text/javascript" language="javascript" src="../js/jquery.dataTables.js"></script>  
   <script src="../js/materialize.js"></script> 
   <script src="../js/init.js"></script>
+  <?php
+      if(isset($_GET['mensaje']) && $_GET['mensaje']>0 && $_GET['mensaje']!='900')
+       {  $cant=$_GET['mensaje'];
+        ?>          
+          <script>
+            
+                     alert("Solicitudes insertadas");
+            
+          </script>      
+        <?php
+        }
+        else
+        {
+          if(isset($_GET['mensaje']) && $_GET['mensaje']==0)
+          {
+          ?>
+            <script>
+              
+                alert("No hay nuevas solicitudes");
+              
+            </script> 
+            <?php 
+          }
+          else
+          {
+              if(isset($_GET['mensaje']) && $_GET['mensaje']=='900')  
+              {?>
+                <script>
+              
+                alert("Elija un proceso");
+              
+                </script> <?php 
+              }     
+          }
+        }
+    ?>          
   </body>
 </html>
 <?php

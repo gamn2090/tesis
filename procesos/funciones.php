@@ -432,7 +432,8 @@ function mostrar_proceso($proceso,$bandera,$nivel,$conn)
 							$carrera_siguiente=$result->fields[4];
 							$cedula2=base64_encode ($cedula);
 							$numero_sol2=base64_encode ($numero_sol);
-							$link="<a href=\"evaluar.php?id=".$cedula2."&numero=".$numero_sol2."\" target='_blank'>Evaluar</a>";							
+							$proceso=base64_encode($proceso);
+							$link="<a href=\"evaluar.php?proceso=".$proceso."&id=".$cedula2."&numero=".$numero_sol2."\" target='_blank'>Evaluar</a>";							
 							$query3="SELECT * FROM esp WHERE codigo LIKE '%$carrera_actual%'";
 							$result=$conn->Execute($query3);
 							if($result==false)
@@ -490,12 +491,6 @@ function mostrar_proceso($proceso,$bandera,$nivel,$conn)
 				{
 					$query="SELECT * FROM solicitudes_rein WHERE (proceso LIKE '$proceso%' AND exp NOT LIKE '-1')";
 					$result=$conn->Execute($query);	
-				}
-				else
-				{
-					$query="SELECT * FROM solicitudes_rein WHERE (proceso LIKE '$proceso%' AND exp LIKE '-1')";
-					$result=$conn->Execute($query);	
-				}		
 					if($result==false)
 					{
 						echo "error al recuperar: ".$conn->ErrorMsg()."<br>" ;
@@ -521,6 +516,41 @@ function mostrar_proceso($proceso,$bandera,$nivel,$conn)
 							$data[$j]=array("cedula"=>$cedula,
 											"numero"=> $numero_sol,
 											"grupo"=> $grupo,
+											"link"=>$link);
+							$j++;
+						} 
+						header('Content-type: application/json');
+						return json_encode($data);
+					}
+				}
+				else
+				{
+					$query="SELECT * FROM solicitudes_rein WHERE (proceso LIKE '$proceso%' AND exp LIKE '-1')";
+					$result=$conn->Execute($query);	
+				}		
+					if($result==false)
+					{
+						echo "error al recuperar: ".$conn->ErrorMsg()."<br>" ;
+					}
+					else
+					{		
+						$j=0;
+						while(!$result->EOF) 
+						{	
+							for ($i=0, $max=$result->FieldCount(); $i<$max; $i++)
+							{	
+								$proceso=$result->fields[3];						
+								$cedula=$result->fields[0];
+								$numero_sol=$result->fields[1];
+								$cedula2=base64_encode($cedula);
+								$numero_sol2=base64_encode($numero_sol);
+								$proceso=base64_encode($proceso);
+								$link="<a href=\"evaluar.php?proceso=".$proceso."&id=".$cedula2."&numero=".$numero_sol2."\" target='_blank'>Evaluar</a>";						
+								$result->MoveNext();											
+								break;												
+							}
+							$data[$j]=array("cedula"=>$cedula,
+											"numero"=> $numero_sol,
 											"link"=>$link);
 							$j++;
 						} 
@@ -968,7 +998,7 @@ function cargar_datos_estudiante($proceso,$numero_soli,$cedula,$nivel,$conn)
 	}
 	else
 	{
-		$fecha=$result->fields[4];
+		$fecha=$result->fields['fecha_solicitud'];
 		$razon=$result->fields[2];
 		$exp=$result->fields[5];
 	}
@@ -1114,14 +1144,32 @@ function mostrar_datos_estudiante_sec($numero_soli,$cedula,$nombre,$apellido,$ra
                         </div>
                     </div>                
 	                <div class="row">
-
+	                	<?php 
+	                	if($proceso == 'Retiro' || $proceso == 'Cambio')
+	                	{
+	                	?>
 	                	 <div class="input-field col s6">
 						    <select id="Aval" name="aval">
 						      <option value="" disabled selected>¿Presentó soportes?</option>
 						      <option value="Si">Si</option>
 						      <option value="No">No</option>
 						    </select>
-						 </div>		                
+						 </div>	
+						<?php
+						}
+						else
+						{
+						?>
+							<div class="input-field col s6">
+						    <select id="Aval" name="aval">
+						      <option value="" disabled selected>¿Tiene cambios de especialidad?</option>
+						      <option value="Si">Si</option>
+						      <option value="No">No</option>
+						    </select>
+						 </div>	
+						<?php
+						}
+						?>	                
 		                <div class="input-field col s6 ">
                             <input id="discapacidad"  type="text" class="validate" disabled value="<?php echo $discapacidad; ?>">
                             <label for="discapacidad">¿Tiene discapacidad?</label>
@@ -1433,10 +1481,11 @@ function validar_solicitud($numero_soli,$anio,$fecha,$cedula,$razon,$solicitud_a
 
 		case 'Reingreso':
 				if($aval=="Si")
-				{
+				{	$cambio=1;
+					$grupo=evaluar_reingreso($cedula, $cambio, $fecha, $conn);
 					$periodo=saber_periodo($anio,$fecha,$conn);
 					$aval="RCC-".$cont.".".$anio.".".$periodo;
-					$query2="UPDATE solicitudes_rein SET exp='$aval' WHERE numero_soli= $numero_soli";
+					$query2="UPDATE solicitudes_rein SET grupo='$grupo', exp='$aval' WHERE numero_soli= $numero_soli";
 					$result=$conn->Execute($query2);
 					if($result==false)
 					{
@@ -1450,7 +1499,11 @@ function validar_solicitud($numero_soli,$anio,$fecha,$cedula,$razon,$solicitud_a
 				else
 				{
 					$aval="0";
-					$query2="UPDATE solicitudes_rein SET exp='$aval' WHERE numero_soli= $numero_soli";
+					$cambio=0;
+					$grupo=evaluar_reingreso($cedula, $cambio, $fecha, $conn);
+					$periodo=saber_periodo($anio,$fecha,$conn);
+					$aval="RCC-".$cont.".".$anio.".".$periodo;
+					$query2="UPDATE solicitudes_rein SET grupo='$grupo', exp='$aval' WHERE numero_soli= $numero_soli";
 					$result=$conn->Execute($query2);
 					if($result==false)
 					{
@@ -2873,52 +2926,57 @@ function evaluar_reingreso($cedula, $cambios, $fecha, $conn)
 		"6" -> "permanencia del 25%"
 	*/
 	
-	if(($Cont >= 10) && ($creditos_apro < ($creditos_titulo/2)) && $cambios > 0)
+	if(($cont >= 10) && ($creditos_apro < ($creditos_titulo/2)) && $cambios > 0)
 	{
-		$grupo = 1;
+		$grupo = '1';
 	}
 	else
 	{
-		if(($Cont >= 10) && ($creditos_apro < ($creditos_titulo/2)) && $cambios = 0)
+		if(($cont >= 10) && ($creditos_apro < ($creditos_titulo/2)) && $cambios == 0)
 		{
-			$grupo = 2;
+			$grupo = '2';
 		}
 		else
 		{
 			if($medida=='4')	
 			{
-				$grupo = 3;
+				$grupo = '3';
 			}
 			else
 			{
 				if($cambios > 0 && $cont_medida == 0)
 				{
-					$grupo = 4;
+					$grupo = '4';
 				}	
 				else
 				{
 					if($medida=='5')
 					{
-						$grupo= 5;
+						$grupo= '5';
 					}	
 					else
 					{
 						if($medida=='6')
 						{
-							$grupo = 6;	
+							$grupo = '6';	
 						}	
 						else
 						{
-							if($cambios == 0 && $medida == 0)
+							if($cambios == 0 && $cont_medida == 0)
 							{
-								$grupo = 7;
+								$grupo = '7';
 							}	
+							else
+							{
+								$grupo= '7';
+							}
 						}
 					}
 				}
 			}
 		}	
 	}
+	return $grupo;
 	
 }
 /*=================================================================================================================================
@@ -2958,9 +3016,13 @@ function cargar_solicitudes($proceso,$conn)
 		$query="SELECT a.*
 				FROM solicitudes a
 				WHERE not exists ( select 1
-								   from solicitudes_ret b
+								   from solicitudes_ret b, decisiones c
 								   where b.cedula = a.cedula
 								   and b.fecha_solicitud = a.fecha )
+				and not exists   ( select 1
+								   from decisiones c
+								   where c.cedula = a.cedula
+								   and c.fecha_solicitud = a.fecha )
 				and a.t_solicitud = '".$proceso."' 
 				and a.estatus	  = 'aprobado'";
 	break;
@@ -2971,6 +3033,10 @@ function cargar_solicitudes($proceso,$conn)
 								   from solicitudes_rein b
 								   where b.cedula = a.cedula
 								   and b.fecha_solicitud = a.fecha )
+				and not exists   ( select 1
+								   from decisiones c
+								   where c.cedula = a.cedula
+								   and c.fecha_solicitud = a.fecha )
 				and a.t_solicitud = '".$proceso."' 
 				and a.estatus	  = 'aprobado'";
 	break;
@@ -2981,6 +3047,10 @@ function cargar_solicitudes($proceso,$conn)
 								   from solicitudes_cde b
 								   where b.cedula = a.cedula
 								   and b.fecha_solicitud = a.fecha )
+				and not exists   ( select 1
+								   from decisiones c
+								   where c.cedula = a.cedula
+								   and c.fecha_solicitud = a.fecha )
 				and a.t_solicitud = '".$proceso."' 
 				and a.estatus	  = 'aprobado'";		
 	break;
