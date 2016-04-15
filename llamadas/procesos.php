@@ -17,7 +17,7 @@ if($usuario!= NULL)
   <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1.0, user-scalable=no"/>
 
   <title>Coordinación Académica</title>
-
+	<link rel="shortcut icon" href="http://sistemas.udo.edu.ve:80/favicon.ico">
   <!-- CSS  -->
   <link rel="stylesheet" type="text/css" href="../css/jquery.dataTables.css">
   <link href="https://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet">

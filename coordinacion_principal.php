@@ -8,11 +8,11 @@ if($usuario!= NULL)
 ?>
 <!DOCTYPE html>
 <html lang="en">
-<head>
-  <meta http-equiv="Content-Type" content="text/html; charset=UTF-8"/>
+<head>  
   <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1.0, user-scalable=no"/>
   <title>Coordinación Académica</title>
-	
+  <meta charset=UTF-8"/>
+  <link rel="shortcut icon" href="http://sistemas.udo.edu.ve:80/favicon.ico">
 </head>
 
 
